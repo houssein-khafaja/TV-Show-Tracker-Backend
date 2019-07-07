@@ -7,7 +7,7 @@ export class RegisterResponse
     readonly isSuccess: boolean;
 }
 
-export class RegisterRequest
+export class RegisterAndLoginRequest
 {
     @IsEmail({}, { message: 'Invalid Email' })
     readonly email: string;

@@ -1,8 +1,13 @@
 import { Document, Schema } from "mongoose";
 
-export interface User extends Document
+// this is for a regular object that we could send back as a response
+export interface PublicUser
 {
     email: string,
-    password: string,
     isActive: boolean
+}
+
+export interface User extends Document, PublicUser
+{
+    password: string
 }

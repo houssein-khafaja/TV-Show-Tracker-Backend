@@ -52,7 +52,7 @@ export class UserService
         // otherwise send another verification with user we found earlier
         else
         {   
-            let emailSentMessage: string;
+            let emailSentMessage: string = "";
 
             // only sresend if user is not active
             if (!oldUser.isActive)

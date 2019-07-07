@@ -15,7 +15,7 @@ export class MongoExceptionFilter implements ExceptionFilter
         switch (exception.code)
         {
             // 11000 means duplicate key in that case we want 
-            // to return code 409, otherwise we default
+            // to return code 409, otherwise we default to 500
             case 11000:
                 errorCode = 409;
                 message = "Username already exists! If its not activated, we will resend the activation email."

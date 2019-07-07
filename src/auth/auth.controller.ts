@@ -1,19 +1,21 @@
-import { Controller, Post, Body, UseFilters, Get, Param, Render, Res, Query } from '@nestjs/common';
-import { RegisterResponse, RegisterRequest } from './dto/register.dto';
+import { Controller, Post, Body, UseFilters, Get, Param, Render, Res, Query, UseGuards } from '@nestjs/common';
+import { RegisterResponse, RegisterAndLoginRequest } from './dto/register.dto';
 import { UserService } from './user.service';
+import { AuthService } from './auth.service';
 import { User } from './interfaces/User.interface';
 import { MongoExceptionFilter } from './exception-filters/auth-exception.filter';
 import { EmailVerificationToken } from './interfaces/email-verification-token.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 @UseFilters(new MongoExceptionFilter())
 export class AuthController
 {
-    constructor(private readonly userService: UserService) { }
+    constructor(private readonly userService: UserService, private readonly authService: AuthService) { }
 
     // /auth/register
     @Post("register")
-    async register(@Body() req: RegisterRequest): Promise<RegisterResponse>
+    async register(@Body() req: RegisterAndLoginRequest): Promise<RegisterResponse>
     {
         return this.userService.registerUser(req.email, req.password);
     }
@@ -21,10 +23,10 @@ export class AuthController
     // /auth/verify
     @Get("verify")
     @Render('email-verification')
-    async root(@Query('verification') verifyToken: string, @Query('email') email: string)
+    async verify(@Query('verification') verifyToken: string, @Query('email') email: string)
     {
         console.log(email);
-        
+
         // find user
         let user: User = await this.userService.getUser(email);
 
@@ -61,5 +63,20 @@ export class AuthController
             // user was not found
             return { message: "Email was not found!" }
         }
+    }
+
+    @Post("login")
+    async login(@Body() req: RegisterAndLoginRequest): Promise<{}>
+    {
+        const token: string = await this.authService.login(req.email, req.password);
+        return { token };
+    }
+
+    // check if jwt token is valid
+    @Post("ping")
+    @UseGuards(AuthGuard())
+    async ping()
+    {
+        return "Success!"
     }
 }
