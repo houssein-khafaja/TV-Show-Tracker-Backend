@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Mongoose, Schema } from 'mongoose';
 import { User } from '../interfaces/user.interface';
@@ -15,8 +15,7 @@ const emailExistence = require('email-existence');
 export class UserService 
 {
     constructor(@InjectModel('User') private readonly userModel: Model<User>,
-        @InjectModel('EmailVerificationToken') private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
-        private readonly emailVerificationService: EmailVerificationService) { }
+        @Inject('EmailVerificationService') private readonly emailVerificationService: EmailVerificationService) { }
 
     async registerUser(email: string, password: string): Promise<RegisterResponse>
     {

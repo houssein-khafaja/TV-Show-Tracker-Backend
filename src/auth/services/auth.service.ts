@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { User } from '../interfaces/user.interface';
@@ -10,19 +10,31 @@ export class AuthService
 {
     constructor(private readonly usersService: UserService, private readonly jwtService: JwtService) { }
 
-    async login(email: string, password: string): Promise<string>
+    async login(email: string, password: string): Promise<string | null>
     {
         // find user then compare password to hashed password
         let user: User = await this.usersService.getUser(email);
-        let isAuthorized: boolean = await compare(password, user.password);
 
-        if(isAuthorized && user.isActive)
+        // does user exist?
+        if (user)
         {
-            return this.jwtService.sign({email: user.email});
+            let isAuthorized: boolean = await compare(password, user.password);
+
+            // if the user entered correct password AND is verified by email, then return a signed JWT
+            // else thow exception
+            if (isAuthorized && user.isActive)
+            {
+                return this.jwtService.sign({ email: user.email });
+            }
+            else
+            {
+                throw new UnauthorizedException();
+            }
         }
         else
         {
-            throw new UnauthorizedException();
+            // user doesnt exist
+            throw new NotFoundException();
         }
     }
 

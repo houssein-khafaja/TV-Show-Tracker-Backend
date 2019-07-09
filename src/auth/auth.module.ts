@@ -11,6 +11,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { passportSecert } from 'config';
+import { EmailVerificationService } from './services/email-verification.service';
 
 @Module({
     imports: [
@@ -24,7 +25,7 @@ import { passportSecert } from 'config';
         }),
     ],
     controllers: [AuthController],
-    providers: [UserService, AuthService, JwtStrategy], // , { provide: getModelToken('User'), useValue: userModel }
+    providers: [UserService, AuthService, JwtStrategy, EmailVerificationService], // , { provide: getModelToken('User'), useValue: userModel }
     exports: [PassportModule, AuthService],
 })
 export class AuthModule { }
