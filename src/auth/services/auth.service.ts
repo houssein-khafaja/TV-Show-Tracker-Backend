@@ -8,7 +8,8 @@ import { compare } from 'bcrypt';
 @Injectable()
 export class AuthService
 {
-    constructor(private readonly usersService: UserService, private readonly jwtService: JwtService) { }
+    constructor(private readonly usersService: UserService, 
+                private readonly jwtService: JwtService) { }
 
     async login(email: string, password: string): Promise<string | null>
     {
@@ -24,17 +25,17 @@ export class AuthService
             // else thow exception
             if (isAuthorized && user.isActive)
             {
-                return this.jwtService.sign({ email: user.email });
+                return this.jwtService.sign({ email: user.email, _userId: user.id });
             }
             else
             {
-                throw new UnauthorizedException();
+                throw new UnauthorizedException("Username or password was incorrect, or the user has not been verified by email.");
             }
         }
         else
         {
             // user doesnt exist
-            throw new NotFoundException();
+            throw new NotFoundException("User was not found.");
         }
     }
 

@@ -7,21 +7,21 @@ import { RegisterResponse } from '../dto/register.dto';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { randomBytes } from 'crypto';
 import { createTransport } from 'nodemailer';
-import { emailPassword, emailVerificationEndPoint } from 'config';
+import { ConfigService } from 'src/config.service';
 const emailExistence = require('email-existence');
 
 @Injectable()
 export class EmailVerificationService 
 {
     constructor(@InjectModel('User') private readonly userModel: Model<User>,
-                @InjectModel('EmailVerificationToken') private readonly emailVerificationTokenModel: Model<EmailVerificationToken>) { }
+                @InjectModel('EmailVerificationToken') private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
+                private readonly config: ConfigService) { }
 
     async getEmailVerificationToken(_userId: Schema.Types.ObjectId): Promise<EmailVerificationToken>
     {
         return await this.emailVerificationTokenModel.findOne({ _userId }).exec();
     }
 
-    // this works fine except
     async sendVerificationEmail(_userId: Schema.Types.ObjectId, email: string)
     {
         let tokenToSend: EmailVerificationToken;
@@ -49,8 +49,8 @@ export class EmailVerificationService
                 service: 'gmail',
                 auth:
                 {
-                    user: 'twiglaser@gmail.com',
-                    pass: emailPassword
+                    user: this.config.email,
+                    pass: this.config.emailPassword
                 }
             });
 
@@ -61,7 +61,7 @@ export class EmailVerificationService
             to: email,
             subject: 'Please Verify Your Email with Tracker App',
             html: `<h3>Welcome to Tracker</h3>
-            <p><a href="${emailVerificationEndPoint}?verification=${tokenToSend.token}&email=${email}">
+            <p><a href="${this.config.emailVerificationUri}?verification=${tokenToSend.token}&email=${email}">
                 Please click here</a> to verify your email address.</p>`
         };
 

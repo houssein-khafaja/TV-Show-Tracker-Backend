@@ -7,9 +7,14 @@ export const SubscriptionSchema = new mongoose.Schema({
         required: true, 
         ref: 'User' 
     },
-    showId: 
+    tmdbId: 
     { 
         type: Number, 
-        required: true 
+        required: true
+    },
+    tvdbId: 
+    { 
+        type: Number, 
+        required: true
     }
 });

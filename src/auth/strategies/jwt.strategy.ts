@@ -3,29 +3,30 @@ import { AuthService } from '../services/auth.service';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-import { passportSecert } from 'config';
 import { User } from '../interfaces/user.interface';
+import { ConfigService } from 'src/config.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly authService: AuthService)
+export class JwtStrategy extends PassportStrategy(Strategy)
+{
+    constructor(private readonly authService: AuthService, 
+                private readonly config: ConfigService)
     {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: passportSecert,
+            secretOrKey: config.jwtSecret,
         });
     }
 
     async validate(payload: JwtPayload)/* : Promise<JwtPayload | null> */
     {
         const user = await this.authService.authenticateUser(payload);
-        console.log(user);
-        
+
         if (!user || !user.isActive)
         {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("User was either not found or is not verified by email.");
         }
 
-        return payload; 
+        return payload;
     }
 }

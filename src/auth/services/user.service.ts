@@ -7,7 +7,6 @@ import { RegisterResponse } from '../dto/register.dto';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { randomBytes } from 'crypto';
 import { createTransport } from 'nodemailer';
-import { emailPassword, emailVerificationEndPoint } from 'config';
 import { EmailVerificationService } from './email-verification.service';
 const emailExistence = require('email-existence');
 
@@ -22,8 +21,6 @@ export class UserService
         // check if email is even real
         if (!await this.emailVerificationService.doesEmailExist(email))
         {
-            console.log("init");
-
             // its not real so lets tell the user
             return { email, message: "The email you provided is not available!", isSuccess: false }
         }
@@ -41,14 +38,14 @@ export class UserService
         if (!oldUser)
         {
             // register the user
-            const registeredUser: User = new this.userModel({ email, password })
-            let newUser: User = await registeredUser.save();
+            const newUser: User = new this.userModel({ email, password })
+            let registeredUser: User = await newUser.save();
 
             //send the email
-            this.emailVerificationService.sendVerificationEmail(newUser._id, newUser.email);
+            this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
 
             isSuccess = true;
-            messageToSend = `A new user was created and a verification email was sent to ${newUser.email}`;
+            messageToSend = `A new user was created and a verification email was sent to ${registeredUser.email}`;
         }
         // otherwise send another verification with user we found earlier
         else
@@ -72,10 +69,18 @@ export class UserService
     }
 
     // mainly for cleaning up after testing
-    async deleteUser(email: string): Promise<string>
+    async deleteUser(email: string): Promise<{}>
     {
-        await this.userModel.findOne({ email }).remove().exec();
-        return "User deleted";
+        let result: { ok?: number; n?: number; deletedCount?: number } = await this.userModel.deleteOne({ email }).exec();
+
+        if (result.deletedCount == 1)
+        {
+            return { statusCode: 201, message: "User deleted" };
+        }
+        else
+        {
+            return { statusCode: 201, message: "User was NOT deleted" };
+        }
     }
 
     async getUser(email: string): Promise<User>

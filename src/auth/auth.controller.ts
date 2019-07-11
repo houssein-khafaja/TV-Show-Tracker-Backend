@@ -28,8 +28,6 @@ export class AuthController
     @Render('email-verification')
     async verify(@Query('verification') verifyToken: string, @Query('email') email: string)
     {
-        console.log(email);
-
         // find user
         let user: User = await this.userService.getUser(email);
 

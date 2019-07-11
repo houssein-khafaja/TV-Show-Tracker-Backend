@@ -10,22 +10,28 @@ import { AuthService } from './services/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { passportSecert } from 'config';
 import { EmailVerificationService } from './services/email-verification.service';
+import { ConfigService } from '../config.service'
+import { ConfigModule } from 'src/config.module';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, { name: "EmailVerificationToken", schema: EmailVerificationTokenSchema }]),
         PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.register({
-            secret: passportSecert,
-            signOptions: {
-                expiresIn: '360d',
-            },
+        JwtModule.registerAsync({
+            // secret: passportSecert,
+            // signOptions: {
+            //     expiresIn: '360d',
+            // },
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.jwtSecret,
+            }),
+            inject: [ConfigService],
         }),
     ],
     controllers: [AuthController],
     providers: [UserService, AuthService, JwtStrategy, EmailVerificationService], // , { provide: getModelToken('User'), useValue: userModel }
-    exports: [PassportModule, AuthService],
+    exports: [PassportModule, AuthService, UserService],
 })
 export class AuthModule { }
