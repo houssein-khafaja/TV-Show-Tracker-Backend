@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, Min, IsString, MinLength, IsNumber } from 'class-validator';
 import { isNumber } from 'util';
+import { DecodedJwt } from 'src/auth/interfaces/decodedJwt.interface';
 
 // export class SubscriptionResponse
 // {
@@ -14,6 +15,7 @@ export class SubscriptionRequestBody
     //     { message: "showId must be a number" })
     readonly tmdbId: number;
     readonly tvdbId: number;
+    readonly decodedJwt: DecodedJwt;
 }
 
 export class SubscriptionRequestHeaders

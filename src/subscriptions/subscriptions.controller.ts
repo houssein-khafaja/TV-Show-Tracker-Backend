@@ -8,29 +8,26 @@ import { JwtService } from '@nestjs/jwt';
 @UseGuards(AuthGuard())
 export class SubscriptionsController 
 {
-    constructor(private readonly subscriptionsService: SubscriptionsService,
-        private readonly jwtService: JwtService, ) { }
+    constructor(private readonly subscriptionsService: SubscriptionsService ) { }
 
     @Post("add")
     async addSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
     {
-        let userId: string = this.decodeAuthToObject(headers)._userId;
-
+        let userId: string = req.decodedJwt._userId;
         return this.subscriptionsService.addSubscription(userId, req.tmdbId, req.tvdbId);
     }
 
     @Post("remove")
     async removeSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
     {
-        let userId: string = this.decodeAuthToObject(headers)._userId;
-
+        let userId: string = req.decodedJwt._userId;
         return this.subscriptionsService.deleteSubscription(userId, req.tmdbId, req.tvdbId);
     }
 
     @Post("upcoming")
-    async viewUpcomingEpisodes(@Headers() headers: SubscriptionRequestHeaders)
+    async viewUpcomingEpisodes(@Body() req: SubscriptionRequestBody)
     {
-        let userId: string = this.decodeAuthToObject(headers)._userId;
+        let userId: string = req.decodedJwt._userId;
         await this.subscriptionsService.getAllSubscriptions(userId);
         // this.subscriptionsService.getAllSubscriptions(userId).subscribe((observer)=>
         // {
@@ -42,10 +39,11 @@ export class SubscriptionsController
         return "this.subscriptionsService.getAllSubscriptions(userId)";
     }
 
-    decodeAuthToObject(headers: SubscriptionRequestHeaders): { _userId: string }
-    {
-        let jwtToken: string = headers.authorization.slice(7);
+    // decodeAuthToObject(headers: SubscriptionRequestHeaders): { _userId: string }
+    // {
+    //     let jwtToken: string = headers.authorization.slice(7);
+    //     console.log(headers.);
         
-        return (this.jwtService.decode(jwtToken) as { _userId: string });
-    }
+    //     return (this.jwtService.decode(jwtToken) as { _userId: string });
+    // }
 }

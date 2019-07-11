@@ -13,17 +13,6 @@ import { ConfigModule } from 'src/config.module';
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, { name: 'Subscription', schema: SubscriptionSchema }]),
-        JwtModule.registerAsync({
-            // secret: passportSecert,
-            // signOptions: {
-            //     expiresIn: '360d',
-            // },
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.jwtSecret,
-            }),
-            inject: [ConfigService],
-        }),
         AuthModule,
         HttpModule],
     controllers: [SubscriptionsController],

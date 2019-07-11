@@ -7,6 +7,7 @@ export class BootstrapService implements OnApplicationBootstrap
     constructor(private readonly config: ConfigService,
         private readonly httpService: HttpService) { }
 
+    // use api credentials to get our 24hour JWt token
     async onApplicationBootstrap()
     {
         let body =
@@ -17,14 +18,14 @@ export class BootstrapService implements OnApplicationBootstrap
         };
 
         let response = await this.httpService.post(this.config.tvdbLoginUri, body).toPromise();
-        
+
         if (response.data.token)
         {
             this.config.tvdbJwtToken = response.data.token;
         }
         else
         {
-            throw new BadRequestException("Something went wrong with bootstrap")
+            throw new BadRequestException("Couldnt get JWT token from TVDB api")
         }
 
     }
