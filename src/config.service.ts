@@ -20,6 +20,8 @@ export class ConfigService
     get tvdbUsername(): string { return this.envConfig.TVDB_USERNAME; }
     get tvdbUserKey(): string { return this.envConfig.TVDB_USERKEY; }
     get tvdbLoginUri(): string { return this.envConfig.TVDB_LOGIN_URI; }
+    get tvdbRefreshUri(): string { return this.envConfig.TVDB_REFRESH_URI; }
+    get tvdbSeriesUri(): string { return this.envConfig.TVDB_SERIES_URI; }
     get tvdbJwtToken(): string { return this.envConfig.TVDB_JWT_TOKEN; }
     set tvdbJwtToken(newToken: string) { this.envConfig.TVDB_JWT_TOKEN = newToken; }
 
@@ -47,7 +49,9 @@ export class ConfigService
             TVDB_USERNAME: Joi.string().default(''),
             TVDB_USERKEY: Joi.string().default(''),
             TVDB_LOGIN_URI: Joi.string().default(''),
-            TVDB_JWT_TOKEN: Joi.string().default('asd')
+            TVDB_REFRESH_URI: Joi.string().default(''),
+            TVDB_SERIES_URI: Joi.string().default(''),
+            TVDB_JWT_TOKEN: Joi.string().default('')
         });
 
         const { error, value: validatedEnvConfig } = Joi.validate(envConfig, envVarsSchema);

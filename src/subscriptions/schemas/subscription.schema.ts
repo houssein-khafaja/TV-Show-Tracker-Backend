@@ -11,10 +11,5 @@ export const SubscriptionSchema = new mongoose.Schema({
     { 
         type: Number, 
         required: true
-    },
-    tvdbId: 
-    { 
-        type: Number, 
-        required: true
     }
 });

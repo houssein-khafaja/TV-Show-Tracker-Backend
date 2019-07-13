@@ -14,7 +14,6 @@ export class SubscriptionRequestBody
     // @IsNumber({ allowInfinity: false, allowNaN: false },
     //     { message: "showId must be a number" })
     readonly tmdbId: number;
-    readonly tvdbId: number;
     readonly decodedJwt: DecodedJwt;
 }
 

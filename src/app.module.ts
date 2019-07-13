@@ -2,7 +2,7 @@ import { Module, HttpService, HttpModule, MiddlewareConsumer, NestModule } from 
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-import { BootstrapService } from './bootstrap.service';
+import { TvdbJwtService } from './subscriptions/services/tvdb-jwt.service';
 import { AuthenticationMiddleware } from './auth/middleware/auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';
@@ -18,7 +18,7 @@ import { ConfigService } from './config.service';
             }),
             inject: [ConfigService],
         })],
-    providers: [BootstrapService]
+    providers: []
 })
 
 export class AppModule implements NestModule

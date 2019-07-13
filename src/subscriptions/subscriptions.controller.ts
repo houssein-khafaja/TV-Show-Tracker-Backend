@@ -1,6 +1,6 @@
-import { Controller, Post, UseGuards, Body, Headers } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Headers, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SubscriptionsService } from './subscriptions.service';
+import { SubscriptionsService } from './services/subscriptions.service';
 import { SubscriptionRequestBody, SubscriptionRequestHeaders } from './dto/subscriptions.dto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -13,37 +13,21 @@ export class SubscriptionsController
     @Post("add")
     async addSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
     {
-        let userId: string = req.decodedJwt._userId;
-        return this.subscriptionsService.addSubscription(userId, req.tmdbId, req.tvdbId);
+        const userId: string = req.decodedJwt._userId;
+        return this.subscriptionsService.addSubscription(userId, req.tmdbId);
     }
 
     @Post("remove")
     async removeSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
     {
-        let userId: string = req.decodedJwt._userId;
-        return this.subscriptionsService.deleteSubscription(userId, req.tmdbId, req.tvdbId);
+        const userId: string = req.decodedJwt._userId;
+        return this.subscriptionsService.deleteSubscription(userId, req.tmdbId);
     }
 
     @Post("upcoming")
     async viewUpcomingEpisodes(@Body() req: SubscriptionRequestBody)
     {
-        let userId: string = req.decodedJwt._userId;
-        await this.subscriptionsService.getAllSubscriptions(userId);
-        // this.subscriptionsService.getAllSubscriptions(userId).subscribe((observer)=>
-        // {
-        //     console.log(observer.data);
-            
-        // })
-        // console.log(await this.subscriptionsService.getAllSubscriptions(userId).toPromise());
-        
-        return "this.subscriptionsService.getAllSubscriptions(userId)";
+        const userId: string = req.decodedJwt._userId;
+        return await this.subscriptionsService.getAllSubscriptions(userId);
     }
-
-    // decodeAuthToObject(headers: SubscriptionRequestHeaders): { _userId: string }
-    // {
-    //     let jwtToken: string = headers.authorization.slice(7);
-    //     console.log(headers.);
-        
-    //     return (this.jwtService.decode(jwtToken) as { _userId: string });
-    // }
 }
