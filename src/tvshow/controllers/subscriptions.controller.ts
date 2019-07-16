@@ -1,7 +1,7 @@
 import { Controller, Post, UseGuards, Body, Headers, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SubscriptionsService } from './services/subscriptions.service';
-import { SubscriptionRequestBody, SubscriptionRequestHeaders } from './dto/subscriptions.dto';
+import { SubscriptionsService } from '../services/subscriptions.service';
+import { SubscriptionRequestBody, SubscriptionRequestHeaders } from '../dto/subscriptions.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('subscriptions')
@@ -24,8 +24,8 @@ export class SubscriptionsController
         return this.subscriptionsService.deleteSubscription(userId, req.tmdbId);
     }
 
-    @Post("upcoming")
-    async viewUpcomingEpisodes(@Body() req: SubscriptionRequestBody)
+    @Get("/")
+    async getSubscriptions(@Body() req: SubscriptionRequestBody)
     {
         const userId: string = req.decodedJwt._userId;
         return await this.subscriptionsService.getAllSubscriptions(userId);

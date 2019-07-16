@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Mongoose, Schema } from 'mongoose';
 import { User } from '../interfaces/user.interface';
@@ -13,8 +13,10 @@ const emailExistence = require('email-existence');
 @Injectable()
 export class UserService 
 {
-    constructor(@InjectModel('User') private readonly userModel: Model<User>,
-        @Inject('EmailVerificationService') private readonly emailVerificationService: EmailVerificationService) { }
+    constructor(
+        @InjectModel('User') private readonly userModel: Model<User>,
+        private readonly emailVerificationService: EmailVerificationService)
+    { }
 
     async registerUser(email: string, password: string): Promise<{}>
     {
@@ -43,13 +45,16 @@ export class UserService
             const registeredUser: User = await newUser.save();
 
             //send the email
-            this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
+            let emailSendResponse = this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
+
+            console.log(emailSendResponse);
+            
 
             messageToSend = `A new user was created and a verification email was sent to ${registeredUser.email}`;
         }
         // otherwise send another verification with user we found earlier
         else
-        {   
+        {
             let emailSentMessage: string = "";
 
             // only sresend if user is not active
@@ -88,7 +93,7 @@ export class UserService
         const result: User = await this.userModel.findOne({ email }).exec();
 
         // if we dont want to throw an excpetions, then return result regardles if a user was found
-        if(result || !throwException)
+        if (result || !throwException)
         {
             return result;
         }
@@ -97,5 +102,5 @@ export class UserService
             throw new NotFoundException("User was not found!");
         }
     }
-    
+
 }

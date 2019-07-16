@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, NotAcceptableException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, NotAcceptableException, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Mongoose, Schema } from 'mongoose';
 import { User } from '../interfaces/user.interface';
@@ -14,10 +14,10 @@ const emailExistence = require('email-existence');
 @Injectable()
 export class EmailVerificationService 
 {
-    constructor(@InjectModel('User') private readonly userModel: Model<User>,
+    constructor(
         @InjectModel('EmailVerificationToken') private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
-        private readonly config: ConfigService,
-        private readonly userService: UserService) { }
+        private readonly config: ConfigService)
+    { }
 
     async getEmailVerificationToken(_userId: Schema.Types.ObjectId): Promise<EmailVerificationToken>
     {
@@ -29,7 +29,7 @@ export class EmailVerificationService
         }
         else
         {
-            throw new NotFoundException("Email Verification Token was not found!")
+            return null;
         }
 
     }
@@ -79,7 +79,7 @@ export class EmailVerificationService
         //send the email
         const sentEmail = await transporter.sendMail(mailOptions);
         console.log(sentEmail);
-        
+
     }
 
     // This function is just a wrapper around the email-existence package.
@@ -98,44 +98,5 @@ export class EmailVerificationService
 
     }
 
-    async verifyUser(email: string, verifyToken: string)
-    {
-        // find user
-        const user: User = await this.userService.getUser(email);
-
-        if (user.isActive)
-        {
-            // already verified
-            throw new NotAcceptableException("Email is already verified!");
-        }
-        else
-        {
-            // not verified, lets try to verify it then!
-            // does user have a verification token active?
-            const tokenFound: EmailVerificationToken = await this.getEmailVerificationToken(user._id);
-
-            if (tokenFound && tokenFound.token == verifyToken)
-            {
-                // tokens match, time to verify!
-                user.isActive = true;
-                const result: User = await user.save();
-
-                if (result)
-                {
-                    return { statusCode: 201, message: "Email was successfully verified!" }
-
-                }
-                else
-                {
-                    throw new InternalServerErrorException("Email was NOT successfully verified!")
-                }
-            }
-            else
-            {
-                // tokens didnt match or no token was found
-                throw new NotFoundException("Email was NOT verified! Please re-register to resend the verification link.");
-            }
-
-        }
-    }
+    
 }

@@ -2,13 +2,15 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { DecodedJwt } from '../interfaces/decodedJwt.interface';
-import { TvdbJwtService } from 'src/subscriptions/services/tvdb-jwt.service';
+import { TvdbJwtService } from 'src/tvshow/services/tvdb.service';
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware
 {
-    constructor(private readonly jwtService: JwtService,
-        private readonly tvdbJwtService: TvdbJwtService) { }
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly tvdbJwtService: TvdbJwtService)
+    { }
 
     use(req: Request, res: Response, next: Function)
     {

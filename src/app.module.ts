@@ -1,15 +1,15 @@
 import { Module, HttpService, HttpModule, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-import { TvdbJwtService } from './subscriptions/services/tvdb-jwt.service';
+import { TVShowModule } from './tvshow/tvshow.module';
+import { TvdbJwtService } from './tvshow/services/tvdb.service';
 import { AuthenticationMiddleware } from './auth/middleware/auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';
 import { ConfigService } from './config.service';
 
 @Module({
-    imports: [AuthModule, SubscriptionsModule, HttpModule,
+    imports: [AuthModule, TVShowModule, HttpModule,
         MongooseModule.forRoot('mongodb://localhost/passport', { useNewUrlParser: true }),
         JwtModule.registerAsync({
             imports: [ConfigModule],

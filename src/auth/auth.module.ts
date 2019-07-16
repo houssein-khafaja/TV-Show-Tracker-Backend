@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './services/user.service';
-import { AuthController } from './auth.controller';
+import { AuthController } from './controllers/auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './schemas/user.schema';
 import { EmailVerificationTokenSchema } from './schemas/email-verification-token.schema';
@@ -11,7 +11,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailVerificationService } from './services/email-verification.service';
-import { ConfigService } from '../config.service'
+import { ConfigService } from 'src/config.service'
 import { ConfigModule } from 'src/config.module';
 
 @Module({
@@ -31,7 +31,7 @@ import { ConfigModule } from 'src/config.module';
         }),
     ],
     controllers: [AuthController],
-    providers: [UserService, AuthService, JwtStrategy, EmailVerificationService], // , { provide: getModelToken('User'), useValue: userModel }
+    providers: [AuthService, JwtStrategy, EmailVerificationService, UserService], // , { provide: getModelToken('User'), useValue: userModel }
     exports: [PassportModule, AuthService, UserService],
 })
 export class AuthModule { }

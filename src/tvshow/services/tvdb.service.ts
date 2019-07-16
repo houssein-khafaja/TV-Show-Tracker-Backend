@@ -5,11 +5,18 @@ import { AxiosRequestConfig, AxiosResponse } from 'axios';
 @Injectable()
 export class TvdbJwtService implements OnApplicationBootstrap
 {
-    constructor(private readonly config: ConfigService,
-        private readonly httpService: HttpService) { }
+    constructor(
+        private readonly config: ConfigService,
+        private readonly httpService: HttpService)
+    { }
 
     // use api credentials to get our 24hour JWt token
     async onApplicationBootstrap()
+    {
+        await this.getNewTvdbJwtToken();
+    }
+
+    async getNewTvdbJwtToken()
     {
         const body =
         {
@@ -25,7 +32,7 @@ export class TvdbJwtService implements OnApplicationBootstrap
         if (response.data.token)
         {
             console.log("jwt token for tvadb recieved");
-            
+
             this.config.tvdbJwtToken = response.data.token;
         }
         else
@@ -37,9 +44,9 @@ export class TvdbJwtService implements OnApplicationBootstrap
     async refreshTvdbJwtToken()
     {
         const config: AxiosRequestConfig = { headers: { Authorization: "Bearer " + this.config.tvdbJwtToken } }
-        const response:AxiosResponse = await this.httpService.get(this.config.tvdbRefreshUri, config).toPromise();
-        
-        if(response.data.token)
+        const response: AxiosResponse = await this.httpService.get(this.config.tvdbRefreshUri, config).toPromise();
+
+        if (response.data.token)
         {
             this.config.tvdbJwtToken = response.data.token;
         }
