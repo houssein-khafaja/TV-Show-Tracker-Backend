@@ -6,7 +6,7 @@ export interface Subscription extends Document
     tmdbId: number
 }
 
-export interface SubscriptionResponseModel
+export interface TvShowModel
 {
     name: string,
     overview: string,
@@ -23,7 +23,7 @@ export interface SubscriptionResponseModel
     tmdbId: string // used as an index for search purposes
 }
 
-export interface PopularShowModel
+export interface MinifiedShowModel
 {
     tmdbId: number,
     name: string,

@@ -14,8 +14,7 @@ export class AuthController
 {
     constructor(
         private readonly userService: UserService,
-        private readonly authService: AuthService,
-        private readonly emailVerificationService: EmailVerificationService)
+        private readonly authService: AuthService)
     { }
 
     // /auth/register

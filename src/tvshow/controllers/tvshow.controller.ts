@@ -12,13 +12,10 @@ export class TvShowController
 {
     constructor(private readonly tmdbService: TmdbService) { }
 
-    @Get("popular")
-    async getPopularShows(@Query('start') pageStart: number, @Query('end') pageEnd: number)
+    @Get("query")
+    async getPopularShows(@Query('query') query: string, @Query('start') pageStart: number, @Query('end') pageEnd: number)
     {
-        // console.log(pageStart);
-        // console.log(pageEnd);
-        
-        return await this.tmdbService.getPopularShows(pageStart, pageEnd);
+        return await this.tmdbService.queryShows(pageStart, pageEnd, query);
     }
 
     @Get(":id")
