@@ -7,6 +7,7 @@ import { AuthenticationMiddleware } from './auth/middleware/auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';
 import { ConfigService } from './config.service';
+import { UserService } from './auth/services/user.service';
 
 @Module({
     imports: [AuthModule, TVShowModule, HttpModule,

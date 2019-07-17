@@ -11,8 +11,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailVerificationService } from './services/email-verification.service';
-import { ConfigService } from 'src/config.service'
-import { ConfigModule } from 'src/config.module';
+import { ConfigService } from '../config.service'
+import { ConfigModule } from '../config.module';
 
 @Module({
     imports: [

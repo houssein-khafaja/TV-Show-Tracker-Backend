@@ -1,8 +1,8 @@
-import { Document, Schema } from "mongoose";
+import { Document, Schema, Types } from "mongoose";
 
 export interface Subscription extends Document
 {
-    _userId: Schema.Types.ObjectId,
+    _userId: Types.ObjectId,
     tmdbId: number
 }
 

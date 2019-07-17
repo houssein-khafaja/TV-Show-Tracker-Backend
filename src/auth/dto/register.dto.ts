@@ -10,8 +10,8 @@ export class RegisterResponse
 export class RegisterAndLoginRequest
 {
     @IsEmail({}, { message: 'Invalid Email' })
-    readonly email: string;
+    email: string;
 
     @MinLength(6, { message: 'Invalid Password' })
-    readonly password: string;
+    password: string;
 }

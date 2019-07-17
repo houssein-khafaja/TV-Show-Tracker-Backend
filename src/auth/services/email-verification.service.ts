@@ -7,7 +7,7 @@ import { RegisterResponse } from '../dto/register.dto';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { randomBytes } from 'crypto';
 import { createTransport } from 'nodemailer';
-import { ConfigService } from 'src/config.service';
+import { ConfigService } from '../../config.service';
 import { UserService } from './user.service';
 const emailExistence = require('email-existence');
 
@@ -15,7 +15,8 @@ const emailExistence = require('email-existence');
 export class EmailVerificationService 
 {
     constructor(
-        @InjectModel('EmailVerificationToken') private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
+        @InjectModel('EmailVerificationToken') 
+        private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
         private readonly config: ConfigService)
     { }
 
@@ -78,12 +79,10 @@ export class EmailVerificationService
 
         //send the email
         const sentEmail = await transporter.sendMail(mailOptions);
-        console.log(sentEmail);
-
     }
 
     // This function is just a wrapper around the email-existence package.
-    // Checks to see if your email actually exists at given domain
+    // Checks to see if your email actually exists at given domain and returns a promise.
     doesEmailExist(email: string): Promise<boolean>
     {
         return new Promise((resolve, reject) =>
@@ -97,6 +96,4 @@ export class EmailVerificationService
         })
 
     }
-
-    
 }

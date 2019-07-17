@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException, HttpService } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Subscription, TvShowModel } from '../interfaces/subscription.interface';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/auth/interfaces/user.interface';
@@ -9,13 +9,15 @@ import { Observable } from 'rxjs';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { ConfigService } from 'src/config.service';
 import { TmdbService } from './tmdb-service';
+import { ObjectId } from 'mongodb';
 
 
 @Injectable()
 export class SubscriptionsService 
 {
     constructor(
-        @InjectModel('Subscription') private readonly subscriptionModel: Model<Subscription>,
+        @InjectModel('Subscription') 
+        private readonly subscriptionModel: Model<Subscription>,
         private readonly tmdbService: TmdbService)
     { }
 
@@ -27,7 +29,7 @@ export class SubscriptionsService
         // if we dont find one, add the new sub
         if (!subExists)
         {
-            const newSubscription: Subscription = new this.subscriptionModel({ _userId, tmdbId });
+            const newSubscription: Subscription = new this.subscriptionModel({ _userId: Types.ObjectId(_userId), tmdbId });
             const result: Subscription = await newSubscription.save();
             if (result)
             {

@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException, NotAcceptableException, HttpService, OnApplicationBootstrap, BadRequestException } from '@nestjs/common';
 import { TvShowModel, MinifiedShowModel } from '../interfaces/subscription.interface';
 import { promises } from 'fs';
-import { ConfigService } from 'src/config.service';
+import { ConfigService } from '../../config.service';
 import { AxiosPromise, AxiosResponse, AxiosRequestConfig } from 'axios';
 
 @Injectable()

@@ -14,7 +14,8 @@ const emailExistence = require('email-existence');
 export class UserService 
 {
     constructor(
-        @InjectModel('User') private readonly userModel: Model<User>,
+        @InjectModel('User') 
+        private readonly userModel: Model<User>,
         private readonly emailVerificationService: EmailVerificationService)
     { }
 
@@ -103,4 +104,10 @@ export class UserService
         }
     }
 
+    // // testing email verification is
+    // async verifyBackdoor(email: string)
+    // {
+    //     let user: User = await this.getUser(email);
+    //     user.isActive = true
+    // }
 }
