@@ -51,7 +51,7 @@ export class UserService
             console.log(emailSendResponse);
             
 
-            messageToSend = `A new user was created and a verification email was sent to ${registeredUser.email}`;
+            messageToSend = `Aa new user was created and a verification email was sent to ${registeredUser.email}`;
         }
         // otherwise send another verification with user we found earlier
         else
