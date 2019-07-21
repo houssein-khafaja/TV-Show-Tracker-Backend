@@ -1,22 +1,18 @@
-import { Injectable, InternalServerErrorException, NotFoundException, NotAcceptableException, forwardRef, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Mongoose, Schema } from 'mongoose';
-import { User } from '../interfaces/user.interface';
-import { hash } from 'bcrypt';
-import { RegisterResponse } from '../dto/register.dto';
+import { Model, Schema } from 'mongoose';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { randomBytes } from 'crypto';
-import { createTransport } from 'nodemailer';
+import { createTransport, SentMessageInfo } from 'nodemailer';
 import { ConfigService } from '../../config.service';
-import { UserService } from './user.service';
 const emailExistence = require('email-existence');
 
 @Injectable()
 export class EmailVerificationService 
 {
     constructor(
-        @InjectModel('EmailVerificationToken') 
-        private readonly emailVerificationTokenModel: Model<EmailVerificationToken>,
+        @InjectModel('EmailVerificationToken')
+        private readonly emailVerificationTokenModel: Model<EmailVerificationToken | null>,
         private readonly config: ConfigService)
     { }
 
@@ -35,7 +31,7 @@ export class EmailVerificationService
 
     }
 
-    async sendVerificationEmail(_userId: Schema.Types.ObjectId, email: string)
+    async sendVerificationEmail(_userId: Schema.Types.ObjectId, email: string): Promise<SentMessageInfo>
     {
         let tokenToSend: EmailVerificationToken;
 
@@ -77,8 +73,8 @@ export class EmailVerificationService
                 Please click here</a> to verify your email address.</p>`
         };
 
-        //send the email
-        const sentEmail = await transporter.sendMail(mailOptions);
+        // send the email, return response
+        return await transporter.sendMail(mailOptions);
     }
 
     // This function is just a wrapper around the email-existence package.

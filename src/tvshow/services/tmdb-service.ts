@@ -21,14 +21,14 @@ export class TmdbService implements OnApplicationBootstrap
 
     async onApplicationBootstrap()
     {
-        // we need to call the api to get a list of genres because for some reason they decided
-        // to return only the ID's with some endpoints and not others (why not include the names ALL the time?)
+        // we need to call the api to get a list of genres because they decided
+        // to return only the ID's with some endpoints and not others
         this.genres = (await this.httpService.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${this.config.tmdbApiKey}&language=en-US`).toPromise()).data.genres;
-
-
     }
 
-    async queryShows(pageStart: number = 1, pageEnd: number = 10, query?: string)
+    // searchs Tmdb with a query input and returns most relveant shows
+    // will return the most popular shows if no query word is given
+    async queryShows(pageStart: number = 1, pageEnd: number = 10, query?: string): Promise<MinifiedShowModel[]>
     {
         if (pageStart > pageEnd)
         {
@@ -54,10 +54,10 @@ export class TmdbService implements OnApplicationBootstrap
                 }
 
             }
-
+            
             // execute batch of promises
             const responses: AxiosResponse[] = await Promise.all(requestPromises);
-
+            
             // for each response, extract data from results
             // then append to popularShowsToSend
             responses.forEach(res => 
@@ -72,24 +72,25 @@ export class TmdbService implements OnApplicationBootstrap
                         poster_path: show.poster_path,
                         vote_average: show.vote_average,
                         vote_count: show.vote_count,
-                        // Oof, not very readable but heres whats happening:
-                        // the genres list (which contains all genres) gets filtered down to a subset of
-                        // genres where only the genres belonging to the popularShow remain
-                        genres: this.genres.filter(i => show.genre_ids.indexOf(i.id) >= 0),
+                        genres: this.genereIDsToObjects(show.genre_ids),
                     }
                     showsToSend.push(popularShowToSend);
                 });
             });
 
-            return { statusCode: 201, data: showsToSend };
+            return showsToSend;
         }
     }
 
-    async getShow(showID: number): Promise<{}>
+    // gets a single show based on given showID
+    async getShow(showID: number): Promise<TvShowModel>
     {
-        return { statusCode: 201, data: (await this.getShows([showID]))[0] }
+        let result: TvShowModel[] = await this.getShows([showID]);
+        
+        return result[0];
     }
 
+    // gets a list of specific shows based on an array of show IDs
     async getShows(showIDs: number[]): Promise<TvShowModel[]>
     {
         // we need to make a batch  of requests to TMDB so we will save them as promises
@@ -151,5 +152,13 @@ export class TmdbService implements OnApplicationBootstrap
         });
 
         return tvShowsToSend;
+    }
+
+    //convert an array of genere IDs to full genre objects (which includes the names)
+    genereIDsToObjects(genreIDs: number[]): MinifiedShowModel["genres"]
+    {
+        // the genres list (which contains all genres) gets filtered down to a subset of
+        // genres that have IDs that exist in the genreIDs array
+        return this.genres.filter(i => genreIDs.indexOf(i.id) >= 0)
     }
 }

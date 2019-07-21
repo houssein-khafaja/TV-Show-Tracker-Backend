@@ -17,7 +17,7 @@ export interface TvShowModel
     vote_average: number,
     vote_count: number,
     episode_run_time: number[],
-    genres: { id: number, name: string },
+    genres: { id: number, name: string }[],
     videos: {}[],
     external_ids: { tvdb_id: number },
     tmdbId: string // used as an index for search purposes
@@ -25,11 +25,11 @@ export interface TvShowModel
 
 export interface MinifiedShowModel
 {
-    tmdbId: number,
     name: string,
     overview: string,
     poster_path: string,
     vote_average: number,
     vote_count: number,
     genres: { id: number, name: string }[],
+    tmdbId: number,
 }

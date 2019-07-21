@@ -13,7 +13,7 @@ async function bootstrap()
     app.useStaticAssets(path.join(__dirname, '..', 'public'));
     app.setBaseViewsDir(path.join(__dirname, '..', 'views'));
     app.setViewEngine('hbs');
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({ transform: true,  validationError: { target: false, value: false } }));
     await app.listen(3000);
 }
 bootstrap();

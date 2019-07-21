@@ -16,7 +16,7 @@ export class AuthService
         private readonly emailVerificationService: EmailVerificationService)
     { }
 
-    async login(email: string, password: string): Promise<{}>
+    async login(email: string, password: string): Promise<string>
     {
         // find user then compare password to hashed password
         const user: User = await this.usersService.getUser(email);
@@ -26,9 +26,7 @@ export class AuthService
         // else thow exception
         if (isAuthorized && user.isActive)
         {
-            const token: string = this.jwtService.sign({ email: user.email, _userId: user.id });
-
-            return { statusCode: 201, token };
+            return this.jwtService.sign({ email: user.email, _userId: user.id });
         }
         else
         {
@@ -36,44 +34,34 @@ export class AuthService
         }
     }
 
-    async verifyUser(email: string, verifyToken: string)
+    async verifyUser(email: string, verifyToken: string): Promise<string>
     {
         // find user
         const user: User = await this.usersService.getUser(email);
 
+        // is user verified?
         if (user.isActive)
         {
-            // already verified
-            throw new NotAcceptableException("Email is already verified!");
+            return "Email is already verified!";
         }
+        // not verified, lets try to verify it then!
         else
         {
-            // not verified, lets try to verify it then!
-            // does user have a verification token active?
+            // search for a verification token
             const tokenFound: EmailVerificationToken = await this.emailVerificationService.getEmailVerificationToken(user._id);
 
             if (tokenFound && tokenFound.token == verifyToken)
             {
                 // tokens match, time to verify!
                 user.isActive = true;
-                const result: User = await user.save();
-
-                if (result)
-                {
-                    return { statusCode: 201, message: "Email was successfully verified!" }
-
-                }
-                else
-                {
-                    throw new InternalServerErrorException("Email was NOT successfully verified!")
-                }
+                let verifiedUser: User =  await user.save();
+                return `${verifiedUser.email} was successfully verified!`;
             }
             else
             {
                 // tokens didnt match or no token was found
-                throw new NotFoundException("Email was NOT verified! Please re-register to resend the verification link.");
+                return "Email was NOT verified! Please re-register to resend the verification link.";
             }
-
         }
     }
 }

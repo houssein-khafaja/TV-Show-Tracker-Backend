@@ -1,10 +1,9 @@
-import { Controller, Post, UseGuards, Body, Headers, Get, Res, Param, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SubscriptionsService } from '../services/subscriptions.service';
-import { SubscriptionRequestBody, SubscriptionRequestHeaders } from '../dto/subscriptions.dto';
-import { JwtService } from '@nestjs/jwt';
 import { TmdbService } from '../services/tmdb-service';
-import { Response } from 'express';
+import { MinifiedShowModel, TvShowModel } from '../interfaces/subscription.interface';
+import { ReturnPayload } from 'src/interfaces/general';
+import { TvShowRequest } from '../dto/tvshow.dto';
 
 @Controller('tvshow')
 @UseGuards(AuthGuard())
@@ -13,14 +12,16 @@ export class TvShowController
     constructor(private readonly tmdbService: TmdbService) { }
 
     @Get("query")
-    async getPopularShows(@Query('query') query: string, @Query('start') pageStart: number, @Query('end') pageEnd: number)
+    async getPopularShows(@Query() req: TvShowRequest): Promise<ReturnPayload>
     {
-        return await this.tmdbService.queryShows(pageStart, pageEnd, query);
+        let queriedShows: MinifiedShowModel[] = await this.tmdbService.queryShows(req.pageStart, req.pageEnd, req.query);
+        return { statusCode: 201, message: "Query was successful!", data: { queriedShows } }
     }
 
-    @Get(":id")
+    @Get("get/:id")
     async getShow(@Param('id') id: number)
     {
-        return this.tmdbService.getShow(id);
+        let show: TvShowModel = await this.tmdbService.getShow(id);
+        return { statusCode: 201, message: "Query was successful!", data: { show } }
     }
 }

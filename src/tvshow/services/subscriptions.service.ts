@@ -9,19 +9,19 @@ import { Observable } from 'rxjs';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { ConfigService } from 'src/config.service';
 import { TmdbService } from './tmdb-service';
-import { ObjectId } from 'mongodb';
+import { ObjectId, DeleteWriteOpResultObject } from 'mongodb';
 
 
 @Injectable()
 export class SubscriptionsService 
 {
     constructor(
-        @InjectModel('Subscription') 
+        @InjectModel('Subscription')
         private readonly subscriptionModel: Model<Subscription>,
         private readonly tmdbService: TmdbService)
     { }
 
-    async addSubscription(_userId: string, tmdbId: number): Promise<{}>
+    async addSubscription(_userId: string, tmdbId: number): Promise<Subscription>
     {
         // try to find sub
         const subExists: Subscription = await this.getSubscription(_userId, tmdbId)
@@ -30,11 +30,7 @@ export class SubscriptionsService
         if (!subExists)
         {
             const newSubscription: Subscription = new this.subscriptionModel({ _userId: Types.ObjectId(_userId), tmdbId });
-            const result: Subscription = await newSubscription.save();
-            if (result)
-            {
-                return { statusCode: 201, message: "Subscription Added" }
-            }
+            return await newSubscription.save();
         }
         // if we find one, throw exception
         else
@@ -43,13 +39,13 @@ export class SubscriptionsService
         }
     }
 
-    async deleteSubscription(_userId: string, tmdbId: number): Promise<{}>
+    async deleteSubscription(_userId: string, tmdbId: number): Promise<DeleteWriteOpResultObject['result']>
     {
         const result: { ok?: number; n?: number; deletedCount?: number } = await this.subscriptionModel.deleteOne({ _userId, tmdbId }).exec();
 
         if (result.deletedCount == 1)
         {
-            return { statusCode: 201, message: "Subscription deleted" };
+            return result;
         }
         else
         {
@@ -57,12 +53,12 @@ export class SubscriptionsService
         }
     }
 
-    async getSubscription(_userId: string, tmdbId: number): Promise<Subscription> | null
+    async getSubscription(_userId: string, tmdbId: number): Promise<Subscription> 
     {
         return await this.subscriptionModel.findOne({ _userId, tmdbId });
     }
 
-    async getAllSubscriptions(_userId: string)
+    async getAllSubscriptions(_userId: string): Promise<TvShowModel[]>
     {
         // get all sub ids from DB
         const subscriptionsFromDB: Subscription[] = await this.subscriptionModel.find({ _userId });
@@ -70,7 +66,7 @@ export class SubscriptionsService
 
         if (subscriptionIDs.length > 0)
         {
-            return { statusCode: 201, data: await this.tmdbService.getShows(subscriptionIDs) };
+            return await this.tmdbService.getShows(subscriptionIDs);
         }
         else
         {

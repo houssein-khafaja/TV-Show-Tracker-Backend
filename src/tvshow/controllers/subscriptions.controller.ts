@@ -1,33 +1,49 @@
-import { Controller, Post, UseGuards, Body, Headers, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionsService } from '../services/subscriptions.service';
-import { SubscriptionRequestBody, SubscriptionRequestHeaders } from '../dto/subscriptions.dto';
-import { JwtService } from '@nestjs/jwt';
+import { SubscriptionRequest } from '../dto/subscriptions.dto';
+import { ReturnPayload } from 'src/interfaces/general';
+import { Subscription, TvShowModel } from '../interfaces/subscription.interface';
+import { DeleteWriteOpResultObject } from 'mongodb';
+import { DecodedJwt } from 'src/auth/interfaces/decodedJwt.interface';
 
 @Controller('subscriptions')
 @UseGuards(AuthGuard())
 export class SubscriptionsController 
 {
-    constructor(private readonly subscriptionsService: SubscriptionsService ) { }
+    constructor(private readonly subscriptionsService: SubscriptionsService) { }
 
     @Post("add")
-    async addSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
+    async addSubscription(@Body() req: SubscriptionRequest): Promise<ReturnPayload>
     {
         const userId: string = req.decodedJwt._userId;
-        return this.subscriptionsService.addSubscription(userId, req.tmdbId);
+
+        // add the sub
+        let addedSub: Subscription = await this.subscriptionsService.addSubscription(userId, req.tmdbId);
+        console.log(addedSub);
+
+        return { statusCode: 201, message: `Subscription was successfully added!` }
+
     }
 
     @Post("remove")
-    async removeSubscription(@Body() req: SubscriptionRequestBody, @Headers() headers: SubscriptionRequestHeaders)
+    async removeSubscription(@Body() req: SubscriptionRequest): Promise<ReturnPayload>
     {
         const userId: string = req.decodedJwt._userId;
-        return this.subscriptionsService.deleteSubscription(userId, req.tmdbId);
+
+        // remove the sub
+        let removedSub: DeleteWriteOpResultObject['result'] = await this.subscriptionsService.deleteSubscription(userId, req.tmdbId);
+        console.log(removedSub);
+
+        return { statusCode: 201, message: `Subscription was successfully removed!` }
     }
 
     @Get("/")
-    async getSubscriptions(@Body() req: SubscriptionRequestBody)
+    async getSubscriptions(@Body() req: { decodedJwt: DecodedJwt }): Promise<ReturnPayload>
     {
         const userId: string = req.decodedJwt._userId;
-        return await this.subscriptionsService.getAllSubscriptions(userId);
+        let subs: TvShowModel[] = await this.subscriptionsService.getAllSubscriptions(userId);
+
+        return { statusCode: 201, message: `Subscriptions were successfully retrieved!`, data: { subs } };
     }
 }

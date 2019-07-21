@@ -1,14 +1,11 @@
-import { Injectable, Inject, NotFoundException, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Mongoose, Schema } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from '../interfaces/user.interface';
 import { hash } from 'bcrypt';
-import { RegisterResponse } from '../dto/register.dto';
-import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
-import { randomBytes } from 'crypto';
-import { createTransport } from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer';
 import { EmailVerificationService } from './email-verification.service';
-const emailExistence = require('email-existence');
+import { DeleteWriteOpResultObject } from 'mongodb';
 
 @Injectable()
 export class UserService 
@@ -19,7 +16,7 @@ export class UserService
         private readonly emailVerificationService: EmailVerificationService)
     { }
 
-    async registerUser(email: string, password: string): Promise<{}>
+    async registerUser(email: string, password: string): Promise<SentMessageInfo>
     {
         // check if email is even real
         if (!await this.emailVerificationService.doesEmailExist(email))
@@ -34,10 +31,6 @@ export class UserService
         // check if user already exists
         const oldUser: User = await this.getUser(email, false);
 
-        // for response object
-        let code: number = 201;
-        let messageToSend: string;
-
         // if they dont exist, then proceed to register
         if (!oldUser)
         {
@@ -46,47 +39,29 @@ export class UserService
             const registeredUser: User = await newUser.save();
 
             //send the email
-            let emailSendResponse = this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
-
-            console.log(emailSendResponse);
-            
-
-            messageToSend = `Aa new user was created and a verification email was sent to ${registeredUser.email}`;
+            return this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
         }
         // otherwise send another verification with user we found earlier
         else
         {
-            let emailSentMessage: string = "";
-
-            // only sresend if user is not active
+            // only resend if user is not active
             if (!oldUser.isActive)
             {
-                // include that the email was resent
-                emailSentMessage = "Verification email was resent!";
-                //send the email
-                await this.emailVerificationService.sendVerificationEmail(oldUser._id, oldUser.email);
+                // resend the email
+                return await this.emailVerificationService.sendVerificationEmail(oldUser._id, oldUser.email);
             }
-
-            code = 209;
-            messageToSend = `The provided email is already in use! ${emailSentMessage}`;
+            // else the user exists and already active
+            else
+            {
+                throw new UnprocessableEntityException("User already exists and is verified.");
+            }
         }
-
-        return { statusCode: code, message: messageToSend }
     }
 
-    // mainly for cleaning up after testing
-    async deleteUser(email: string): Promise<{}>
+    // mainly for cleaning up after testing (probably be removed later)
+    async deleteUser(email: string): Promise<DeleteWriteOpResultObject['result']>
     {
-        const result: { ok?: number; n?: number; deletedCount?: number } = await this.userModel.deleteOne({ email }).exec();
-
-        if (result.deletedCount == 1)
-        {
-            return { statusCode: 201, message: "User deleted" };
-        }
-        else
-        {
-            throw new NotFoundException("User was NOT deleted");
-        }
+        return await this.userModel.deleteOne({ email }).exec();
     }
 
     async getUser(email: string, throwException: boolean = true): Promise<User>
@@ -103,11 +78,4 @@ export class UserService
             throw new NotFoundException("User was not found!");
         }
     }
-
-    // // testing email verification is
-    // async verifyBackdoor(email: string)
-    // {
-    //     let user: User = await this.getUser(email);
-    //     user.isActive = true
-    // }
 }
