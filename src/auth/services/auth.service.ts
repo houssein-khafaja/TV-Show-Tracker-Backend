@@ -11,7 +11,7 @@ import { EmailVerificationService } from './email-verification.service';
 export class AuthService
 {
     constructor(
-        private readonly usersService: UserService,
+        private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly emailVerificationService: EmailVerificationService)
     { }
@@ -19,7 +19,7 @@ export class AuthService
     async login(email: string, password: string): Promise<string>
     {
         // find user then compare password to hashed password
-        const user: User = await this.usersService.getUser(email);
+        const user: User = await this.userService.getUser(email);
         const isAuthorized: boolean = await compare(password, user.password);
 
         // if the user entered correct password AND is verified by email, then return a signed JWT
@@ -37,7 +37,7 @@ export class AuthService
     async verifyUser(email: string, verifyToken: string): Promise<string>
     {
         // find user
-        const user: User = await this.usersService.getUser(email);
+        const user: User = await this.userService.getUser(email);
 
         // is user verified?
         if (user.isActive)

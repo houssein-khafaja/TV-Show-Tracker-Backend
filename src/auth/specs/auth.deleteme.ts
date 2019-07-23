@@ -11,14 +11,10 @@ import { ConfigModule } from '../../config.module';
 import { ConfigService } from '../../config.service';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { EmailVerificationService } from '../services/email-verification.service';
-import { RegisterAndLoginRequest } from '../dto/register.dto';
-import Imap from 'imap'
-import util from 'util'
 
 describe('Auth', () =>
 {
     let authController: AuthController;
-    let authService: AuthService;
     let userService: UserService;
 
     beforeAll(async () =>
@@ -29,7 +25,8 @@ describe('Auth', () =>
             providers: [AuthService, JwtStrategy, EmailVerificationService, UserService],
             imports: [
                 MongooseModule.forRoot('mongodb://localhost/passport', { useNewUrlParser: true }),
-                MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, { name: "EmailVerificationToken", schema: EmailVerificationTokenSchema }]),
+                MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, 
+                                            { name: "EmailVerificationToken", schema: EmailVerificationTokenSchema }]),
                 PassportModule.register({ defaultStrategy: 'jwt' }),
                 JwtModule.registerAsync({
                     imports: [ConfigModule],
@@ -41,7 +38,6 @@ describe('Auth', () =>
             ]
         }).compile();
 
-        authService = module.get<AuthService>(AuthService);
         userService = module.get<UserService>(UserService);
         authController = module.get<AuthController>(AuthController);
     });
