@@ -37,9 +37,9 @@ export class UserService
             // register the user
             const newUser: User = new this.userModel({ email, password })
             const registeredUser: User = await newUser.save();
-
+            
             //send the email
-            return this.emailVerificationService.sendVerificationEmail(registeredUser._id, registeredUser.email);
+            return this.emailVerificationService.sendVerificationEmail(registeredUser.email, registeredUser._id);
         }
         // otherwise send another verification with user we found earlier
         else
@@ -48,7 +48,7 @@ export class UserService
             if (!oldUser.isActive)
             {
                 // resend the email
-                return await this.emailVerificationService.sendVerificationEmail(oldUser._id, oldUser.email);
+                return await this.emailVerificationService.sendVerificationEmail(oldUser.email, oldUser._id);
             }
             // else the user exists and already active
             else
@@ -58,16 +58,11 @@ export class UserService
         }
     }
 
-    // mainly for cleaning up after testing (probably be removed later)
-    async deleteUser(email: string): Promise<DeleteWriteOpResultObject['result']>
-    {
-        return await this.userModel.deleteOne({ email }).exec();
-    }
-
     async getUser(email: string, throwException: boolean = true): Promise<User>
     {
         const result: User = await this.userModel.findOne({ email }).exec();
-
+        console.log(result);
+        
         // if we dont want to throw an excpetions, then return result regardles if a user was found
         if (result || !throwException)
         {
@@ -75,6 +70,8 @@ export class UserService
         }
         else
         {
+            console.log("asdasd");
+            
             throw new NotFoundException("User was not found!");
         }
     }

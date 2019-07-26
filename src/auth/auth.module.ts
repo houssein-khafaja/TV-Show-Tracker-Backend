@@ -31,7 +31,7 @@ import { ConfigModule } from '../config.module';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, EmailVerificationService, UserService], // , { provide: getModelToken('User'), useValue: userModel }
+    providers: [AuthService, JwtStrategy, EmailVerificationService, UserService],
     exports: [PassportModule, AuthService, UserService],
 })
 export class AuthModule { }

@@ -31,7 +31,7 @@ export class EmailVerificationService
 
     }
 
-    async sendVerificationEmail(_userId: Schema.Types.ObjectId, email: string): Promise<SentMessageInfo>
+    async sendVerificationEmail(email: string, _userId: Schema.Types.ObjectId): Promise<SentMessageInfo>
     {
         let tokenToSend: EmailVerificationToken;
 

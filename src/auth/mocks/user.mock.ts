@@ -1,9 +1,11 @@
 import { NotFoundException } from "@nestjs/common";
 
+export const hashedPassword: string = "$2b$10$dpeZh0MDCz0vSv9UmzfTVuPsn5502QuekHEeBwiphRouvKYyte6MS";
+
 export const userServiceMock =
 {
     registerUser: jest.fn(() => { }),
-    deleteUser: jest.fn(() => { }),
+    // deleteUser: jest.fn(() => { }),
     getUser: jest.fn((email: string) => 
     {
         // returns active user
@@ -12,9 +14,9 @@ export const userServiceMock =
             return {
                 _id: 69,
                 email: email,
-                password: "$2b$10$dpeZh0MDCz0vSv9UmzfTVuPsn5502QuekHEeBwiphRouvKYyte6MS",
+                password: hashedPassword,
                 isActive: true,
-                save: () => { return userServiceMock.getUser(email) }
+                save: () => { return { email }; }
             }
         }
         // returns inactive user
@@ -23,7 +25,7 @@ export const userServiceMock =
             return {
                 _id: 69,
                 email: email,
-                password: "$2b$10$dpeZh0MDCz0vSv9UmzfTVuPsn5502QuekHEeBwiphRouvKYyte6MS",
+                password: hashedPassword,
                 isActive: false,
                 save: () => { return { email }; }
             }
@@ -34,10 +36,14 @@ export const userServiceMock =
             return {
                 _id: 0,
                 email: email,
-                password: "$2b$10$dpeZh0MDCz0vSv9UmzfTVuPsn5502QuekHEeBwiphRouvKYyte6MS",
+                password: hashedPassword,
                 isActive: false,
                 save: () => { return { email }; }
             }
+        }
+        else
+        {
+            return undefined;
         }
     })
 };
