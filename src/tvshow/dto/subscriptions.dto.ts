@@ -6,7 +6,7 @@ import { DecodedJwt } from 'src/auth/interfaces/decodedJwt.interface';
 export class SubscriptionRequest
 {
     @IsNumber({}, { message: "tmdbID must be a valid number" })
-    readonly tmdbId: number;
+    readonly tmdbID: number;
 
     readonly decodedJwt: DecodedJwt;
 }

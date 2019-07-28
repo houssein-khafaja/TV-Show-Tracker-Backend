@@ -61,7 +61,6 @@ export class UserService
     async getUser(email: string, throwException: boolean = true): Promise<User>
     {
         const result: User = await this.userModel.findOne({ email }).exec();
-        console.log(result);
         
         // if we dont want to throw an excpetions, then return result regardles if a user was found
         if (result || !throwException)
@@ -70,8 +69,6 @@ export class UserService
         }
         else
         {
-            console.log("asdasd");
-            
             throw new NotFoundException("User was not found!");
         }
     }

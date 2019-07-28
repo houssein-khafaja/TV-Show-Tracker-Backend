@@ -1,15 +1,29 @@
+/**-----------------------------------------------------------------------------------------------------------------------------------------------------
+ *  Unit Test [User Service]
+ *
+ *  Test Plan:
+ *      - User Service should be defined    
+ *
+ *      - registerUser()
+ *          -[With non existing user & available email] calls doesEmailExist(), getUser() and sendVerificationEmail() with correct params.
+ *          -[With non existing & unavailable email] throws NotFoundException and doesEmailExist() is called with correct params.
+ *          -[With existing & inactive user,  and available email] calls doesEmailExist(), getUser() and sendVerificationEmail() with correct params.
+ *          -[With existing & active user, and available email] throws UnprocessableEntityException and doesEmailExist() is called with correct params.
+ * 
+ *      - getUser()
+ *          -[With user that exists]] returns a user with correct email and findOne() was called with correct params
+ *          -[With user that does NOT exist] throws NotFoundException and findOne() was called with correct params
+ *          -[With user that does NOT exist AND throwException = false] returns undefined and findOne() was called with correct params
+ * 
+ *------------------------------------------------------------------------------------------------------------------------------------------------------**/
 import { UserService } from "../services/user.service";
 import { Test } from "@nestjs/testing";
-import { AuthService } from "../services/auth.service";
-import { JwtStrategy } from "../strategies/jwt.strategy";
 import { EmailVerificationService } from "../services/email-verification.service";
-import { JwtModule, JwtService } from "@nestjs/jwt";
-import { ConfigService } from "../../config.service";
 import { userServiceMock } from "../mocks/user.mock";
 import { emailVerificationServiceMock } from "../mocks/email-verification.mock";
-import { configServiceMock } from "../mocks/config.mock";
-import { UnauthorizedException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
+import { SentMessageInfo } from "nodemailer";
 import { User } from "../interfaces/user.interface";
 
 describe('User Service', () =>
@@ -19,27 +33,40 @@ describe('User Service', () =>
 
     beforeAll(async () =>
     {
+        let EmailVerificationServiceProvider =
+        {
+            provide: EmailVerificationService,
+            useValue: emailVerificationServiceMock
+        };
+
+        let UserModelProvider =
+        {
+            provide: getModelToken("User"),
+            useValue: (() =>
+            {
+                const mongooseUserModel: any = jest.fn();
+                mongooseUserModel.findOne = jest.fn().mockImplementation((filter: { email: string }) => ({
+                    exec: jest.fn(() => userServiceMock.getUser(filter.email)),
+                }));
+
+                mongooseUserModel.mockImplementation((credentials: { email: string, password: string }) =>
+                {
+                    return {
+                        save: () => ({ email: credentials.email, _id: 0 })
+                    }
+                });
+
+                return mongooseUserModel;
+            })(),
+        }
+
         // init test module
         const module = await Test.createTestingModule({
             imports: [],
             providers: [
                 UserService,
-                {
-                    provide: EmailVerificationService,
-                    useValue: emailVerificationServiceMock
-                },
-                {
-                    provide: getModelToken("User"),
-                    useValue: (() =>
-                    {
-                        const mongooseUserModel: any = jest.fn();
-                        mongooseUserModel.findOne = jest.fn().mockImplementation((filter: { email: string }) => ({
-                            exec: jest.fn(() => userServiceMock.getUser(filter.email)),
-                        }));
-
-                        return mongooseUserModel;
-                    })(),
-                },
+                EmailVerificationServiceProvider,
+                UserModelProvider
 
             ]
         }).compile();
@@ -47,16 +74,9 @@ describe('User Service', () =>
         userModel = module.get(getModelToken("User"));
         userService = module.get<UserService>(UserService);
 
-        userModel.mockImplementation((credentials: { email: string, password: string }) =>
-        {
-            return {
-                save: () => ({ email: credentials.email, _id: 0 })
-            }
-        });
-
     });
 
-    it('Auth Service should be defined', () =>
+    it('User Service should be defined', () =>
     {
         expect(userService).toBeTruthy();
     });
@@ -64,63 +84,102 @@ describe('User Service', () =>
     // registerUser()
     describe('registerUser()', () =>
     {
-        it('[With non existing user & available email] returns true. ', async () =>
+        it('[With non existing user & available email] calls doesEmailExist(), getUser() and sendVerificationEmail()  correct params.', async () =>
         {
-            // truthy means email got through to sendVerificationEmail() and returned true
-            expect(await userService.registerUser("not_registered@email.com", "password123")).toBeTruthy();
+            // initialize test inputs and spies
+            let email: string = "not_registered@email.com";
+            let password: string = "password123";
+            let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
+            let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
+            let sendVerificationEmailSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "sendVerificationEmail");
+
+            // run tests
+            let results: SentMessageInfo = await userService.registerUser(email, password);
+            expect(doesEmailExistSpy).toBeCalledWith(email);
+            expect(getUserSpy).toBeCalledWith(email);
+            expect(sendVerificationEmailSpy).toBeCalledWith(email, 0);
         });
 
-        it('[With non existing & unavailable email] throws NotFoundException. ', async () =>
+        it('[With non existing & unavailable email] throws NotFoundException and doesEmailExist() is called with correct params. ', async () =>
         {
-            await expect(userService.registerUser("non-existent-user@email.com", "password123")).rejects.toThrow(NotFoundException);
+            // initialize test inputs and spies
+            let email: string = "non-existent-user@email.com";
+            let password: string = "password123";
+            let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
+
+            // run tests
+            let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
+            expect(results).rejects.toThrow(NotFoundException);
+            expect(doesEmailExistSpy).toBeCalledWith(email);
         });
 
-        it('[With existing & inactive user,  and available email] returns true', async () =>
+        it('[With existing & inactive user,  and available email] calls doesEmailExist(), getUser() and sendVerificationEmail()  correct params.', async () =>
         {
-            // truthy means email got through to sendVerificationEmail() and returned true
-            expect(await userService.registerUser("not_active@email.com", "password123")).toBeTruthy();
+            // initialize test inputs and spies
+            let email: string = "not_active@email.com";
+            let password: string = "password123";
+            let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
+            let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
+            let sendVerificationEmailSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "sendVerificationEmail");
+
+            // run tests
+            let results: SentMessageInfo = await userService.registerUser(email, password);
+            expect(doesEmailExistSpy).toBeCalledWith(email);
+            expect(getUserSpy).toBeCalledWith(email);
+            expect(sendVerificationEmailSpy).toBeCalledWith(email, userServiceMock.getUser(email)._id);
         });
 
-        it('[With existing & active user, and available email] throws UnprocessableEntityException', async () =>
+        it('[With existing & active user, and available email] throws UnprocessableEntityException and doesEmailExist() is called with correct params.', async () =>
         {
-            await expect(userService.registerUser("username@email.com", "password123")).rejects.toThrow(UnprocessableEntityException);
+            // initialize test inputs and spies
+            let email: string = "username@email.com";
+            let password: string = "password123";
+            let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
+
+            // run tests
+            let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
+            expect(results).rejects.toThrow(UnprocessableEntityException);
+            expect(doesEmailExistSpy).toBeCalledWith(email);
         });
     });
 
     // getUser()
     describe('getUser()', () =>
     {
-        it('[With user that exists]] returns a user object with email as property', async () =>
+        it('[With user that exists]] returns a user with correct email and findOne() was called with correct params', async () =>
         {
-            expect((await userService.getUser("username@email.com")).email).toBe("username@email.com");
+            // initialize test inputs and spies
+            let email: string = "username@email.com";
+            let findOneSpy: jest.SpyInstance = jest.spyOn(userModel, "findOne");
+
+            // run tests
+            let results: User = await userService.getUser(email);
+            expect(results.email).toBe(email);
+            expect(findOneSpy).toBeCalledWith({ email });
         });
 
-        it('[With user that does NOT exist] throws UnprocessableEntityException', async () =>
+        it('[With user that does NOT exist] throws NotFoundException and findOne() was called with correct params' , async () =>
         {
-            await expect(userService.getUser("not_registered@email.com")).rejects.toThrow(NotFoundException);
+            // initialize test inputs and spies
+            let email: string = "not_registered@email.com";
+            let findOneSpy: jest.SpyInstance = jest.spyOn(userModel, "findOne");
+
+            // run tests
+            let results: Promise<User> = userService.getUser(email);
+            expect(results).rejects.toThrow(NotFoundException);
+            expect(findOneSpy).toBeCalledWith({ email });
         });
 
-        it('[With user that does NOT exist AND throwException = false] returns undefined', async () =>
+        it('[With user that does NOT exist AND throwException = false] returns undefined and findOne() was called with correct params', async () =>
         {
-            expect(await userService.getUser("not_registered@email.com", false)).toBeUndefined();
+            // initialize test inputs and spies
+            let email: string = "not_registered@email.com";
+            let findOneSpy: jest.SpyInstance = jest.spyOn(userModel, "findOne");
+
+            // run tests
+            let results: User = await userService.getUser(email, false);
+            expect(results).toBeUndefined();
+            expect(findOneSpy).toBeCalledWith({ email });
         });
     });
-    // verifyUser()
-    // describe('verifyUser()', () =>
-    // {
-    //     it('[With active user] returns "Email is already verified!"', async () =>
-    //     {
-    //         expect(await authService.verifyUser("username@email.com", "EmailVerifyToken")).toBe("Email is already verified!");
-    //     });
-
-    //     it('[With inactive user] returns "not_active@email.com was successfully verified!"', async () =>
-    //     {
-    //         expect(await authService.verifyUser("not_active@email.com", "EmailVerifyToken")).toBe("not_active@email.com was successfully verified!");
-    //     });
-
-    //     it('[With inactive user with no verification token] returns "Email was NOT verified! Please re-register to resend the verification link."', async () =>
-    //     {
-    //         expect(await authService.verifyUser("no_token@email.com", "EmailVerifyToken")).toBe("Email was NOT verified! Please re-register to resend the verification link.");
-    //     });
-    // });
 });

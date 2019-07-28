@@ -2,7 +2,7 @@ import { Document, Schema } from "mongoose";
 
 export interface EmailVerificationToken extends Document
 {
-    _userId: Schema.Types.ObjectId,
+    _userId: number,
     token: string,
     createdAt: Date
 }

@@ -5,7 +5,7 @@ import { EmailVerificationToken } from '../interfaces/email-verification-token.i
 import { randomBytes } from 'crypto';
 import { createTransport, SentMessageInfo } from 'nodemailer';
 import { ConfigService } from '../../config.service';
-const emailExistence = require('email-existence');
+var emailCheck = require('email-check');
 
 @Injectable()
 export class EmailVerificationService 
@@ -16,7 +16,7 @@ export class EmailVerificationService
         private readonly config: ConfigService)
     { }
 
-    async getEmailVerificationToken(_userId: Schema.Types.ObjectId): Promise<EmailVerificationToken>
+    async getEmailVerificationToken(_userId: number): Promise<EmailVerificationToken>
     {
         const result: EmailVerificationToken = await this.emailVerificationTokenModel.findOne({ _userId }).exec();
 
@@ -31,7 +31,7 @@ export class EmailVerificationService
 
     }
 
-    async sendVerificationEmail(email: string, _userId: Schema.Types.ObjectId): Promise<SentMessageInfo>
+    async sendVerificationEmail(email: string, _userId: number): Promise<SentMessageInfo>
     {
         let tokenToSend: EmailVerificationToken;
 
@@ -47,7 +47,7 @@ export class EmailVerificationService
         else
         {
             // generate random email verification token and save it
-            tokenToSend = new this.emailVerificationTokenModel({ _userId: _userId, token: randomBytes(16).toString('hex') });
+            tokenToSend = new this.emailVerificationTokenModel({ _userId, token: randomBytes(16).toString('hex') });
             await tokenToSend.save();
         }
 
@@ -65,7 +65,7 @@ export class EmailVerificationService
         // transporter options
         const mailOptions =
         {
-            from: 'twiglaser@gmail.com',
+            from: this.config.email,
             to: email,
             subject: 'Please Verify Your Email with Tracker App',
             html: `<h3>Welcome to Tracker</h3>
@@ -77,19 +77,17 @@ export class EmailVerificationService
         return await transporter.sendMail(mailOptions);
     }
 
-    // This function is just a wrapper around the email-existence package.
+    // This function is just an async wrapper around the email-check package.
     // Checks to see if your email actually exists at given domain and returns a promise.
-    doesEmailExist(email: string): Promise<boolean>
+    async doesEmailExist(email: string): Promise<boolean>
     {
-        return new Promise((resolve, reject) =>
+        return emailCheck(email).then(function (res)
         {
-            emailExistence.check(email, function (response, error)
-            {
-                if (!email) reject(new Error('No email provided!'))
+            return res;
 
-                resolve(error);
-            });
-        })
-
+        }).catch(function (err)
+        {
+            return false;
+        });
     }
 }

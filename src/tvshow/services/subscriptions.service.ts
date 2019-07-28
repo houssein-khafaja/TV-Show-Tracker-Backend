@@ -21,15 +21,15 @@ export class SubscriptionsService
         private readonly tmdbService: TmdbService)
     { }
 
-    async addSubscription(_userId: string, tmdbId: number): Promise<Subscription>
+    async addSubscription(_userId: string, tmdbID: number): Promise<Subscription>
     {
         // try to find sub
-        const subExists: Subscription = await this.getSubscription(_userId, tmdbId)
+        const subExists: Subscription = await this.getSubscription(_userId, tmdbID)
 
         // if we dont find one, add the new sub
         if (!subExists)
         {
-            const newSubscription: Subscription = new this.subscriptionModel({ _userId: Types.ObjectId(_userId), tmdbId });
+            const newSubscription: Subscription = new this.subscriptionModel({ _userId: Types.ObjectId(_userId), tmdbID });
             return await newSubscription.save();
         }
         // if we find one, throw exception
@@ -39,9 +39,9 @@ export class SubscriptionsService
         }
     }
 
-    async deleteSubscription(_userId: string, tmdbId: number): Promise<DeleteWriteOpResultObject['result']>
+    async deleteSubscription(_userId: string, tmdbID: number): Promise<DeleteWriteOpResultObject['result']>
     {
-        const result: { ok?: number; n?: number; deletedCount?: number } = await this.subscriptionModel.deleteOne({ _userId, tmdbId }).exec();
+        const result: { ok?: number; n?: number; deletedCount?: number } = await this.subscriptionModel.deleteOne({ _userId, tmdbID }).exec();
 
         if (result.deletedCount == 1)
         {
@@ -53,16 +53,16 @@ export class SubscriptionsService
         }
     }
 
-    async getSubscription(_userId: string, tmdbId: number): Promise<Subscription> 
+    async getSubscription(_userId: string, tmdbID: number): Promise<Subscription> 
     {
-        return await this.subscriptionModel.findOne({ _userId, tmdbId });
+        return await this.subscriptionModel.findOne({ _userId, tmdbID });
     }
 
     async getAllSubscriptions(_userId: string): Promise<TvShowModel[]>
     {
         // get all sub ids from DB
         const subscriptionsFromDB: Subscription[] = await this.subscriptionModel.find({ _userId });
-        const subscriptionIDs: number[] = subscriptionsFromDB.map(sub => sub.tmdbId);
+        const subscriptionIDs: number[] = subscriptionsFromDB.map(sub => sub.tmdbID);
 
         if (subscriptionIDs.length > 0)
         {

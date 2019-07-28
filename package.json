@@ -33,10 +33,12 @@
     "class-validator": "^0.9.1",
     "crypto": "^1.0.1",
     "dotenv": "^8.0.0",
+    "email-check": "^1.1.0",
     "email-existence": "^0.1.6",
     "hbs": "^4.0.4",
     "imap": "^0.8.19",
     "joi": "^14.3.1",
+    "mail-listener-next": "^1.0.5",
     "mail-listener2": "^0.3.1",
     "mongodb": "^3.3.0-beta2",
     "mongoose": "^5.6.4",
@@ -78,6 +80,13 @@
     "webpack-node-externals": "^1.7.2"
   },
   "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/auth/mocks/",
+      "/src/tvshow/mocks/",
+      "/src/config.service.ts",
+      "/src/auth/strategies"
+    ],
     "moduleFileExtensions": [
       "js",
       "json",

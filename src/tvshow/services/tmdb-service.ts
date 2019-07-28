@@ -66,7 +66,7 @@ export class TmdbService implements OnApplicationBootstrap
                 {
                     const popularShowToSend: MinifiedShowModel =
                     {
-                        tmdbId: show.id,
+                        tmdbID: show.id,
                         name: show.name,
                         overview: show.overview,
                         poster_path: show.poster_path,
@@ -127,7 +127,7 @@ export class TmdbService implements OnApplicationBootstrap
                 genres: res.data.genres,
                 videos: res.data.videos,
                 external_ids: res.data.external_ids,
-                tmdbId: res.data.id
+                tmdbID: res.data.id
             };
 
             tvShowsToSend.push(tvShowToSend)

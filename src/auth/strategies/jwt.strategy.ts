@@ -10,12 +10,13 @@ import { UserService } from '../services/user.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy)
 {
-    constructor(private readonly userService: UserService, config: ConfigService)
+    constructor(private readonly userService: UserService, private readonly config: ConfigService)
     {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: config.jwtSecret,
         });
+
     }
 
     async validate(payload: JwtPayload)/* : Promise<JwtPayload | null> */

@@ -3,7 +3,7 @@ import { Document, Schema, Types } from "mongoose";
 export interface Subscription extends Document
 {
     _userId: Types.ObjectId,
-    tmdbId: number
+    tmdbID: number
 }
 
 export interface TvShowModel
@@ -20,7 +20,7 @@ export interface TvShowModel
     genres: { id: number, name: string }[],
     videos: {}[],
     external_ids: { tvdb_id: number },
-    tmdbId: string // used as an index for search purposes
+    tmdbID: string // used as an index for search purposes
 }
 
 export interface MinifiedShowModel
@@ -31,5 +31,5 @@ export interface MinifiedShowModel
     vote_average: number,
     vote_count: number,
     genres: { id: number, name: string }[],
-    tmdbId: number,
+    tmdbID: number,
 }

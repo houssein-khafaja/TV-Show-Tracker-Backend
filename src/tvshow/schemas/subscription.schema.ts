@@ -7,7 +7,7 @@ export const SubscriptionSchema = new mongoose.Schema({
         required: true, 
         ref: 'User' 
     },
-    tmdbId: 
+    tmdbID: 
     { 
         type: Number, 
         required: true

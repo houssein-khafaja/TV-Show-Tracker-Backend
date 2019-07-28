@@ -19,7 +19,7 @@ export class SubscriptionsController
         const userId: string = req.decodedJwt._userId;
 
         // add the sub
-        let addedSub: Subscription = await this.subscriptionsService.addSubscription(userId, req.tmdbId);
+        let addedSub: Subscription = await this.subscriptionsService.addSubscription(userId, req.tmdbID);
         console.log(addedSub);
 
         return { statusCode: 201, message: `Subscription was successfully added!` }
@@ -32,7 +32,7 @@ export class SubscriptionsController
         const userId: string = req.decodedJwt._userId;
 
         // remove the sub
-        let removedSub: DeleteWriteOpResultObject['result'] = await this.subscriptionsService.deleteSubscription(userId, req.tmdbId);
+        let removedSub: DeleteWriteOpResultObject['result'] = await this.subscriptionsService.deleteSubscription(userId, req.tmdbID);
         console.log(removedSub);
 
         return { statusCode: 201, message: `Subscription was successfully removed!` }

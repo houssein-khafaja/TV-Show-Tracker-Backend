@@ -26,7 +26,7 @@ export class AuthService
         // else thow exception
         if (isAuthorized && user.isActive)
         {
-            return this.jwtService.sign({ email: user.email, _userId: user.id });
+            return this.jwtService.sign({ email: user.email, _id: user._id });
         }
         else
         {
