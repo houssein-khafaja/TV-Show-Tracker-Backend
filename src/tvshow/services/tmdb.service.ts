@@ -8,6 +8,7 @@ import { AxiosPromise, AxiosResponse, AxiosRequestConfig } from 'axios';
 export class TmdbService implements OnApplicationBootstrap
 {
     private genres: MinifiedShowModel["genres"];
+    /* istanbul ignore next */
     get genreList(): MinifiedShowModel["genres"] { return this.genres; }
 
     constructor(
