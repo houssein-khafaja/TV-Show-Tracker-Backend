@@ -2,7 +2,7 @@ import { Module, HttpService, HttpModule, MiddlewareConsumer, NestModule } from 
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { TVShowModule } from './tvshow/tvshow.module';
-import { TvdbJwtService } from './tvshow/services/tvdb.service';
+import { TvdbJwtService } from './tvshow/services/tvdb-jwt.service';
 import { AuthenticationMiddleware } from './auth/middleware/auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';

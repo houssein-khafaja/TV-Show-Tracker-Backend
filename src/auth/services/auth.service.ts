@@ -21,12 +21,12 @@ export class AuthService
         // find user then compare password to hashed password
         const user: User = await this.userService.getUser(email);
         const isAuthorized: boolean = await compare(password, user.password);
-
+        
         // if the user entered correct password AND is verified by email, then return a signed JWT
         // else thow exception
         if (isAuthorized && user.isActive)
         {
-            return this.jwtService.sign({ email: user.email, _id: user._id });
+            return this.jwtService.sign({ email: user.email, _userId: user._id });
         }
         else
         {

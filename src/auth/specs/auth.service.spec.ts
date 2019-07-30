@@ -24,7 +24,7 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
 import { ConfigService } from "../../config.service";
 import { userServiceMock } from "../mocks/user.mock";
 import { emailVerificationServiceMock } from "../mocks/email-verification.mock";
-import { configServiceMock } from "../mocks/config.mock";
+import { configServiceMock } from "../../mocks/config.mock";
 import { UnauthorizedException } from "@nestjs/common";
 import { jwtServiceMock } from "../mocks/jwt-service.mock";
 
@@ -91,7 +91,7 @@ describe('Auth Service', () =>
             // run tests
             let testResults: string = await authService.login(email, password);
             expect(testResults).toBe(email);
-            expect(signSpy).toBeCalledWith({ email: email, _id: 69});
+            expect(signSpy).toBeCalledWith({ email, _userId: 69});
         });
 
         it('[With inactive user] throws UnauthorizedException', async () =>
@@ -102,7 +102,7 @@ describe('Auth Service', () =>
 
             // run tests
             let testResults: Promise<string> = authService.login(email, password);
-            expect(testResults).rejects.toThrow(UnauthorizedException);
+            await expect(testResults).rejects.toThrow(UnauthorizedException);
         });
 
         it('[With incorrect password] throws UnauthorizedException', async () =>
@@ -113,7 +113,7 @@ describe('Auth Service', () =>
 
             // run tests
             let testResults: Promise<string> = authService.login(email, password);
-            expect(testResults).rejects.toThrow(UnauthorizedException)
+            await expect(testResults).rejects.toThrow(UnauthorizedException)
         });
     });
 

@@ -23,7 +23,7 @@ import { Test } from "@nestjs/testing";
 import { EmailVerificationService } from "../services/email-verification.service";
 import { ConfigService } from "../../config.service";
 import { emailVerificationServiceMock } from "../mocks/email-verification.mock";
-import { configServiceMock } from "../mocks/config.mock";
+import { configServiceMock } from "../../mocks/config.mock";
 import { getModelToken } from "@nestjs/mongoose";
 import nodemailer from 'nodemailer';
 import { EmailVerificationToken } from "../interfaces/email-verification-token.interface";

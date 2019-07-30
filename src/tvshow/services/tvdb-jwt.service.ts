@@ -16,7 +16,7 @@ export class TvdbJwtService implements OnApplicationBootstrap
         await this.getNewTvdbJwtToken();
     }
 
-    async getNewTvdbJwtToken()
+    async getNewTvdbJwtToken(): Promise<boolean>
     {
         const body =
         {
@@ -29,11 +29,10 @@ export class TvdbJwtService implements OnApplicationBootstrap
         const response = await this.httpService.post(this.config.tvdbLoginUri, body).toPromise();
 
         // check if we actually got the token
-        if (response.data.token)
+        if (response && response.data && response.data.token)
         {
-            console.log("jwt token for tvadb recieved");
-
             this.config.tvdbJwtToken = response.data.token;
+            return true;
         }
         else
         {
@@ -41,14 +40,15 @@ export class TvdbJwtService implements OnApplicationBootstrap
         }
     }
 
-    async refreshTvdbJwtToken()
+    async refreshTvdbJwtToken(): Promise<boolean>
     {
         const config: AxiosRequestConfig = { headers: { Authorization: "Bearer " + this.config.tvdbJwtToken } }
         const response: AxiosResponse = await this.httpService.get(this.config.tvdbRefreshUri, config).toPromise();
 
-        if (response.data.token)
+        if (response && response.data && response.data.token)
         {
             this.config.tvdbJwtToken = response.data.token;
+            return true;
         }
         else
         {

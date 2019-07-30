@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { DecodedJwt } from '../interfaces/decodedJwt.interface';
-import { TvdbJwtService } from 'src/tvshow/services/tvdb.service';
+import { TvdbJwtService } from 'src/tvshow/services/tvdb-jwt.service';
 
 @Injectable()
 export class AuthenticationMiddleware implements NestMiddleware

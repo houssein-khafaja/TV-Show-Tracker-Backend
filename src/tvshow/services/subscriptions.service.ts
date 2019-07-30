@@ -1,15 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, HttpService } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Subscription, TvShowModel } from '../interfaces/subscription.interface';
-import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/auth/interfaces/user.interface';
-import { UserService } from 'src/auth/services/user.service';
-import { Observable } from 'rxjs';
-import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { ConfigService } from 'src/config.service';
-import { TmdbService } from './tmdb-service';
-import { ObjectId, DeleteWriteOpResultObject } from 'mongodb';
+import { TmdbService } from './tmdb.service';
+import { DeleteWriteOpResultObject } from 'mongodb';
 
 
 @Injectable()
@@ -21,15 +15,15 @@ export class SubscriptionsService
         private readonly tmdbService: TmdbService)
     { }
 
-    async addSubscription(_userId: string, tmdbID: number): Promise<Subscription>
+    async addSubscription(_userId: number, tmdbID: number): Promise<Subscription>
     {
         // try to find sub
-        const subExists: Subscription = await this.getSubscription(_userId, tmdbID)
+        const subExists: Subscription = await this.getSubscription(_userId, tmdbID);
 
         // if we dont find one, add the new sub
         if (!subExists)
         {
-            const newSubscription: Subscription = new this.subscriptionModel({ _userId: Types.ObjectId(_userId), tmdbID });
+            const newSubscription: Subscription = new this.subscriptionModel({ _userId, tmdbID });
             return await newSubscription.save();
         }
         // if we find one, throw exception
@@ -39,13 +33,13 @@ export class SubscriptionsService
         }
     }
 
-    async deleteSubscription(_userId: string, tmdbID: number): Promise<DeleteWriteOpResultObject['result']>
+    async deleteSubscription(_userId: number, tmdbID: number): Promise<boolean>
     {
         const result: { ok?: number; n?: number; deletedCount?: number } = await this.subscriptionModel.deleteOne({ _userId, tmdbID }).exec();
 
         if (result.deletedCount == 1)
         {
-            return result;
+            return true;
         }
         else
         {
@@ -53,24 +47,17 @@ export class SubscriptionsService
         }
     }
 
-    async getSubscription(_userId: string, tmdbID: number): Promise<Subscription> 
+    async getSubscription(_userId: number, tmdbID: number): Promise<Subscription> 
     {
         return await this.subscriptionModel.findOne({ _userId, tmdbID });
     }
 
-    async getAllSubscriptions(_userId: string): Promise<TvShowModel[]>
+    async getAllSubscriptions(_userId: number): Promise<TvShowModel[]>
     {
         // get all sub ids from DB
         const subscriptionsFromDB: Subscription[] = await this.subscriptionModel.find({ _userId });
         const subscriptionIDs: number[] = subscriptionsFromDB.map(sub => sub.tmdbID);
 
-        if (subscriptionIDs.length > 0)
-        {
-            return await this.tmdbService.getShows(subscriptionIDs);
-        }
-        else
-        {
-            throw new NotFoundException("No subscriptions were found!");
-        }
+        return await this.tmdbService.getShows(subscriptionIDs);
     }
 }

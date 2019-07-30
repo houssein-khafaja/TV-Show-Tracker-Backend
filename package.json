@@ -84,6 +84,7 @@
       "/node_modules/",
       "/src/auth/mocks/",
       "/src/tvshow/mocks/",
+      "/src/mocks/",
       "/src/config.service.ts",
       "/src/auth/strategies"
     ],

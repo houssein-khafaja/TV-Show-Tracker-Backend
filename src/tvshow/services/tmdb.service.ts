@@ -7,12 +7,8 @@ import { AxiosPromise, AxiosResponse, AxiosRequestConfig } from 'axios';
 @Injectable()
 export class TmdbService implements OnApplicationBootstrap
 {
-    private genres: { id: number, name: string }[];
-
-    getGenre(id: number): string
-    {
-        return this.genres.find(i => i.id === id).name;
-    }
+    private genres: MinifiedShowModel["genres"];
+    get genreList(): MinifiedShowModel["genres"] { return this.genres; }
 
     constructor(
         private readonly httpService: HttpService,
@@ -36,7 +32,6 @@ export class TmdbService implements OnApplicationBootstrap
         }
         else
         {
-
             const requestPromises: Promise<AxiosResponse>[] = []; // contains batch of promises
             const showsToSend: MinifiedShowModel[] = [];
 
@@ -54,10 +49,10 @@ export class TmdbService implements OnApplicationBootstrap
                 }
 
             }
-            
+
             // execute batch of promises
             const responses: AxiosResponse[] = await Promise.all(requestPromises);
-            
+
             // for each response, extract data from results
             // then append to popularShowsToSend
             responses.forEach(res => 
@@ -85,14 +80,24 @@ export class TmdbService implements OnApplicationBootstrap
     // gets a single show based on given showID
     async getShow(showID: number): Promise<TvShowModel>
     {
+        if (!showID)
+        {
+            throw new BadRequestException("Must provide a valid showID");
+        }
+
         let result: TvShowModel[] = await this.getShows([showID]);
-        
+
         return result[0];
     }
 
     // gets a list of specific shows based on an array of show IDs
     async getShows(showIDs: number[]): Promise<TvShowModel[]>
     {
+        if (showIDs.length == 0)
+        {
+            throw new BadRequestException("No show IDs were given, probably due to an internal error.");
+        }
+
         // we need to make a batch  of requests to TMDB so we will save them as promises
         let requestPromises: Promise<AxiosResponse>[] = [];
 
@@ -100,7 +105,7 @@ export class TmdbService implements OnApplicationBootstrap
         const tvShowsToSend: TvShowModel[] = [];
 
         // for each sub id, create a promise to get the data
-        showIDs.forEach(sub =>
+        showIDs.forEach(async (sub) =>
         {
             requestPromises.push(this.httpService.get(`https://api.themoviedb.org/3/tv/${sub}?api_key=${this.config.tmdbApiKey}&append_to_response=videos,external_ids`).toPromise());
         });
@@ -159,6 +164,6 @@ export class TmdbService implements OnApplicationBootstrap
     {
         // the genres list (which contains all genres) gets filtered down to a subset of
         // genres that have IDs that exist in the genreIDs array
-        return this.genres.filter(i => genreIDs.indexOf(i.id) >= 0)
+        return this.genreList.filter(i => genreIDs.indexOf(i.id) >= 0);
     }
 }

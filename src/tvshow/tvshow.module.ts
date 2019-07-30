@@ -9,9 +9,9 @@ import { JwtService, JwtModule } from '@nestjs/jwt';
 import { AuthService } from 'src/auth/services/auth.service';
 import { ConfigService } from 'src/config.service';
 import { ConfigModule } from 'src/config.module';
-import { TvdbJwtService } from './services/tvdb.service';
+import { TvdbJwtService } from './services/tvdb-jwt.service';
 import { TvShowController } from './controllers/tvshow.controller';
-import { TmdbService } from './services/tmdb-service';
+import { TmdbService } from './services/tmdb.service';
 
 @Module({
     imports: [

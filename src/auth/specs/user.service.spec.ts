@@ -109,7 +109,7 @@ describe('User Service', () =>
 
             // run tests
             let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
-            expect(results).rejects.toThrow(NotFoundException);
+            await expect(results).rejects.toThrow(NotFoundException);
             expect(doesEmailExistSpy).toBeCalledWith(email);
         });
 
@@ -138,7 +138,7 @@ describe('User Service', () =>
 
             // run tests
             let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
-            expect(results).rejects.toThrow(UnprocessableEntityException);
+            await expect(results).rejects.toThrow(UnprocessableEntityException);
             expect(doesEmailExistSpy).toBeCalledWith(email);
         });
     });
@@ -166,7 +166,7 @@ describe('User Service', () =>
 
             // run tests
             let results: Promise<User> = userService.getUser(email);
-            expect(results).rejects.toThrow(NotFoundException);
+            await expect(results).rejects.toThrow(NotFoundException);
             expect(findOneSpy).toBeCalledWith({ email });
         });
 
