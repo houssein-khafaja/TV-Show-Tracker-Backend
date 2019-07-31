@@ -81,11 +81,6 @@ export class TmdbService implements OnApplicationBootstrap
     // gets a single show based on given showID
     async getShow(showID: number): Promise<TvShowModel>
     {
-        if (!showID)
-        {
-            throw new BadRequestException("Must provide a valid showID");
-        }
-
         let result: TvShowModel[] = await this.getShows([showID]);
 
         return result[0];
@@ -94,70 +89,75 @@ export class TmdbService implements OnApplicationBootstrap
     // gets a list of specific shows based on an array of show IDs
     async getShows(showIDs: number[]): Promise<TvShowModel[]>
     {
-        if (showIDs.length == 0)
-        {
-            throw new BadRequestException("No show IDs were given, probably due to an internal error.");
-        }
-
-        // we need to make a batch  of requests to TMDB so we will save them as promises
-        let requestPromises: Promise<AxiosResponse>[] = [];
-
-        // this array will hold all of the data objects we will send back
-        const tvShowsToSend: TvShowModel[] = [];
-
-        // for each sub id, create a promise to get the data
-        showIDs.forEach(async (sub) =>
-        {
-            requestPromises.push(this.httpService.get(`https://api.themoviedb.org/3/tv/${sub}?api_key=${this.config.tmdbApiKey}&append_to_response=videos,external_ids`).toPromise());
-        });
-
-        // execute all promises to get TV data from TMDB API
-        let responses: AxiosResponse[] = await Promise.all(requestPromises);
-
-        // clear request promises to reuse it later
-        requestPromises = [];
-
-        // populate tvShowsToSend with data retrieved from tmdb
-        responses.forEach(res =>
-        {
-            // extract from res data  to send back (we still dont have air times yet)
-            const tvShowToSend: TvShowModel =
+        try {
+            if (showIDs.length == 0)
             {
-                name: res.data.name,
-                overview: res.data.overview,
-                network: res.data.network,
-                poster_path: res.data.poster_path,
-                vote_average: res.data.vote_average,
-                vote_count: res.data.vote_count,
-                episode_run_time: res.data.episode_run_time,
-                genres: res.data.genres,
-                videos: res.data.videos,
-                external_ids: res.data.external_ids,
-                tmdbID: res.data.id
-            };
-
-            tvShowsToSend.push(tvShowToSend)
-
-            // add promise for the request to tvdb api so we can get air times
-            requestPromises.push(this.httpService.get(this.config.tvdbSeriesUri + `/${tvShowToSend.external_ids.tvdb_id}`, this.config.tvdbAuthConfig).toPromise());
-
-        });
-
-        // execute batch promises to get airTimes data from TVDB API
-        responses = await Promise.all(requestPromises);
-
-        // edit tvShowsToSend with data retrieved from tvdb
-        responses.forEach(responseData =>
-        {
-            // find subscription that matches with the tvdb ID
-            const subscription: TvShowModel = tvShowsToSend.find(i => i.external_ids.tvdb_id === responseData.data.data.id);
-
-            // subscription object is a refrence so we can edit it directly
-            subscription.airsDayOfWeek = responseData.data.data.airsDayOfWeek;
-            subscription.airsTime = responseData.data.data.airsTime;
-        });
-
-        return tvShowsToSend;
+                throw new BadRequestException("No show IDs were given, probably due to an internal error.");
+            }
+    
+            // we need to make a batch  of requests to TMDB so we will save them as promises
+            let requestPromises: Promise<AxiosResponse>[] = [];
+    
+            // this array will hold all of the data objects we will send back
+            const tvShowsToSend: TvShowModel[] = [];
+    
+            // for each sub id, create a promise to get the data
+            showIDs.forEach(async (sub) =>
+            {
+                requestPromises.push(this.httpService.get(`https://api.themoviedb.org/3/tv/${sub}?api_key=${this.config.tmdbApiKey}&append_to_response=videos,external_ids`).toPromise());
+            });
+    
+            // execute all promises to get TV data from TMDB API
+            let responses: AxiosResponse[] = await Promise.all(requestPromises);
+            
+            // clear request promises to reuse it later
+            requestPromises = [];
+    
+            // populate tvShowsToSend with data retrieved from tmdb
+            responses.forEach(res =>
+            {
+                // extract from res data  to send back (we still dont have air times yet)
+                const tvShowToSend: TvShowModel =
+                {
+                    name: res.data.name,
+                    overview: res.data.overview,
+                    network: res.data.network,
+                    poster_path: res.data.poster_path,
+                    vote_average: res.data.vote_average,
+                    vote_count: res.data.vote_count,
+                    episode_run_time: res.data.episode_run_time,
+                    genres: res.data.genres,
+                    videos: res.data.videos,
+                    external_ids: res.data.external_ids,
+                    tmdbID: res.data.id
+                };
+    
+                tvShowsToSend.push(tvShowToSend)
+    
+                // add promise for the request to tvdb api so we can get air times
+                requestPromises.push(this.httpService.get(this.config.tvdbSeriesUri + `/${tvShowToSend.external_ids.tvdb_id}`, this.config.tvdbAuthConfig).toPromise());
+    
+            });
+    
+            // execute batch promises to get airTimes data from TVDB API
+            responses = await Promise.all(requestPromises);
+    
+            // edit tvShowsToSend with data retrieved from tvdb
+            responses.forEach(responseData =>
+            {
+                // find subscription that matches with the tvdb ID
+                const subscription: TvShowModel = tvShowsToSend.find(i => i.external_ids.tvdb_id === responseData.data.data.id);
+    
+                // subscription object is a refrence so we can edit it directly
+                subscription.airsDayOfWeek = responseData.data.data.airsDayOfWeek;
+                subscription.airsTime = responseData.data.data.airsTime;
+            });
+    
+            return tvShowsToSend;
+        } catch (err) {
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaa", err);
+            
+        }
     }
 
     //convert an array of genere IDs to full genre objects (which includes the names)

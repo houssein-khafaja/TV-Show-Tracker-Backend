@@ -21,10 +21,10 @@ export class AuthService
         // find user then compare password to hashed password
         const user: User = await this.userService.getUser(email);
         const isAuthorized: boolean = await compare(password, user.password);
-        
+
         // if the user entered correct password AND is verified by email, then return a signed JWT
         // else thow exception
-        if (isAuthorized && user.isActive)
+        if (isAuthorized && user && user.isActive)
         {
             return this.jwtService.sign({ email: user.email, _userId: user._id });
         }
@@ -38,6 +38,11 @@ export class AuthService
     {
         // find user
         const user: User = await this.userService.getUser(email);
+
+        if (!user)
+        {
+            return "User was not found!";
+        }
 
         // is user verified?
         if (user.isActive)
@@ -54,7 +59,7 @@ export class AuthService
             {
                 // tokens match, time to verify!
                 user.isActive = true;
-                let verifiedUser: User =  await user.save();
+                let verifiedUser: User = await user.save();
                 return `${verifiedUser.email} was successfully verified!`;
             }
             else

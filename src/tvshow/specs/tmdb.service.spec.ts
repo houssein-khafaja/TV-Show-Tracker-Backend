@@ -267,15 +267,17 @@ describe('Tmdb Service', () =>
             expect(testResult.tmdbID).toBe(showID);
         });
 
-        it('[With no showID] throws BadRequestException', async () =>
-        {
-            // initialize test inputs and spies
-            let showID: number;
+        // removed because we added class-validator to the controller which handles validation
+        // this means testing this use case will be done in e2e tests
+        // it('[With no showID] throws BadRequestException', async () =>
+        // {
+        //     // initialize test inputs and spies
+        //     let showID: number;
 
-            // run tests
-            let testResult: Promise<TvShowModel> = tmdbService.getShow(showID);
-            await expect(testResult).rejects.toThrow(BadRequestException);
-        });
+        //     // run tests
+        //     let testResult: Promise<TvShowModel> = tmdbService.getShow(showID);
+        //     await expect(testResult).rejects.toThrow(BadRequestException);
+        // });
 
     });
 

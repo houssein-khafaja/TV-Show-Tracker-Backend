@@ -58,6 +58,15 @@ export class SubscriptionsService
         const subscriptionsFromDB: Subscription[] = await this.subscriptionModel.find({ _userId });
         const subscriptionIDs: number[] = subscriptionsFromDB.map(sub => sub.tmdbID);
 
-        return await this.tmdbService.getShows(subscriptionIDs);
+        if (subscriptionIDs.length == 0)
+        {
+            // Its not really an error if we dont find anything, so we shouldnt throw one
+            // instead lets return empty, and let the controller handle it
+            return [];
+        }
+        else
+        {
+            return await this.tmdbService.getShows(subscriptionIDs);
+        }
     }
 }

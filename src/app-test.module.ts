@@ -9,7 +9,7 @@ import { ConfigService } from './config.service';
 
 @Module({
     imports: [AuthModule, TVShowModule, HttpModule,
-        MongooseModule.forRoot('mongodb://localhost/app', { useNewUrlParser: true }),
+        MongooseModule.forRoot('mongodb://localhost/appTest', { useNewUrlParser: true }),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
@@ -20,7 +20,7 @@ import { ConfigService } from './config.service';
     providers: []
 })
 
-export class AppModule implements NestModule
+export class AppTestModule implements NestModule
 {
     configure(consumer: MiddlewareConsumer)
     {

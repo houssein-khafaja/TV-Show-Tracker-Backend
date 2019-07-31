@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TmdbService } from '../services/tmdb.service';
 import { MinifiedShowModel, TvShowModel } from '../interfaces/subscription.interface';
 import { ReturnPayload } from 'src/interfaces/general';
-import { TvShowRequest } from '../dto/tvshow.dto';
+import { TvShowRequest, TvShowGetRequestParam } from '../dto/tvshow.dto';
 
 @Controller('tvshow')
 @UseGuards(AuthGuard())
@@ -19,9 +19,9 @@ export class TvShowController
     }
 
     @Get("get/:id")
-    async getShow(@Param('id') id: number)
+    async getShow(@Param() params: TvShowGetRequestParam)
     {
-        let show: TvShowModel = await this.tmdbService.getShow(id);
+        let show: TvShowModel = await this.tmdbService.getShow(params.id);
         return { statusCode: 201, message: "Query was successful!", data: { show } }
     }
 }

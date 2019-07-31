@@ -18,7 +18,7 @@
  * 
  *      - getAllSubscriptions()
  *          -[with existing user] returns array of tvShows, find() gets called with correct params
- *          -[with non existing user] returns NotFoundException, find() gets called with correct params
+ *          -[with non existing user] returns empty array, find() gets called with correct params
  *--------------------------------------------------------------------------------------------------------------------------------------**/
 
 import { Test } from "@nestjs/testing";
@@ -239,15 +239,15 @@ describe('Subscription Service', () =>
             expect(findSpy).toBeCalledWith({ _userId });
         });
 
-        it('[with non existing user] returns NotFoundException, find() gets called with correct params', async () =>
+        it('[with non existing user] returns empty array, find() gets called with correct params', async () =>
         {
             // initialize test inputs and spies
             let _userId: number = 1;
             let findSpy: jest.SpyInstance = jest.spyOn(subscriptionModel, "find");
 
             // run tests
-            let testResult: Promise<TvShowModel[]> = subscriptionsService.getAllSubscriptions(_userId);
-            await expect(testResult).rejects.toThrow(NotFoundException);
+            let testResult: TvShowModel[] = await subscriptionsService.getAllSubscriptions(_userId);
+            expect(testResult).toHaveLength(0);
             expect(findSpy).toBeCalledWith({ _userId });
         });
     });

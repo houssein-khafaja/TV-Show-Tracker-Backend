@@ -16,16 +16,12 @@ export class SubscriptionsController
     @Post("add")
     async addSubscription(@Body() req: SubscriptionRequest): Promise<ReturnPayload>
     {
-        console.log(req.decodedJwt);
-        
         const userId: number = req.decodedJwt._userId;
 
         // add the sub
-        let asd = await this.subscriptionsService.addSubscription(userId, req.tmdbID);
-        console.log("asd", asd);
-        
-        return { statusCode: 201, message: `Subscription was successfully added!` }
+        await this.subscriptionsService.addSubscription(userId, req.tmdbID);
 
+        return { statusCode: 201, message: `Subscription was successfully added!` };
     }
 
     @Post("remove")
@@ -42,8 +38,17 @@ export class SubscriptionsController
     async getSubscriptions(@Body() req: { decodedJwt: DecodedJwt }): Promise<ReturnPayload>
     {
         const userId: number = req.decodedJwt._userId;
-        
+
         let subs: TvShowModel[] = await this.subscriptionsService.getAllSubscriptions(userId);
-        return { statusCode: 201, message: `Subscriptions were successfully retrieved!`, data: { subs } };
+        
+        if (subs.length == 0)
+        {
+            return { statusCode: 200, message: `No subscriptions were found` };
+        }
+        else
+        {
+            return { statusCode: 200, message: `Subscriptions were successfully retrieved!`, data: { subs } };
+        }
+        
     }
 }

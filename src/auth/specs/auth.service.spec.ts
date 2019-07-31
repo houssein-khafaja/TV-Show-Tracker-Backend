@@ -7,9 +7,9 @@
  *      - login()
  *          -[With correct credentials] returns email and jwtService.Sign is called with correct params
  *          -[With inactive user] throws UnauthorizedException
-*           -[With incorrect password] throws UnauthorizedException
+ *          -[With incorrect password] throws UnauthorizedException
  *
- *      - sendVerificationEmail()
+ *      - verifyUser()
  *          -[With active user] returns "Email is already verified!" and getUser() was called with correct params
  *          -[With inactive user] returns "not_active@email.com was successfully verified!" and getUser() and getEmailVerificationToken() was called with correct params
  *          -[With inactive user with no verification token] returns "Email was NOT verified! Please re-register to resend the verification link." and getUser() was called with correct params
@@ -120,6 +120,19 @@ describe('Auth Service', () =>
     // verifyUser()
     describe('verifyUser()', () =>
     {
+        it('[With non existing user] returns "User was not found!" and getUser() was called with correct params', async () =>
+        {
+            // initialize test inputs and spies
+            let email: string = "idontexist@email.com";
+            let emailVerifyToken: string = "EmailVerifyToken";
+            let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
+
+            // run tests
+            let testResults: string = await authService.verifyUser(email, emailVerifyToken);
+            expect(testResults).toBe("User was not found!");
+            expect(getUserSpy).toBeCalledWith(email);
+        });
+
         it('[With active user] returns "Email is already verified!" and getUser() was called with correct params', async () =>
         {
             // initialize test inputs and spies

@@ -33,7 +33,6 @@ export class AuthController
         {
             throw new ServiceUnavailableException("Verification email was not accepted by the end destination (user's email address).")
         }
-
     }
 
     // /auth/verify
@@ -57,6 +56,6 @@ export class AuthController
     @UseGuards(AuthGuard())
     async ping(): Promise<ReturnPayload>
     {
-        return { statusCode: 201, message: `Token Valid!` }
+        return { statusCode: 200, message: `Token Valid!` }
     }
 }

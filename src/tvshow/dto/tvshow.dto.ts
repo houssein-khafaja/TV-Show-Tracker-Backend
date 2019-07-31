@@ -18,6 +18,12 @@ export class TvShowRequest
 
 }
 
+export class TvShowGetRequestParam
+{
+    @IsNumberString({ message: "id must be a number" })
+    id: number
+}
+
 // export class SubscriptionRequestHeaders
 // {
 //     @IsString({ message: "Authorization header must exist as a string." })
