@@ -84,7 +84,7 @@ Here are a list of routes and their brief descriptions:
     * Returns a list of detailed TV shows that the user is subscribed to
 ### /tvshow
   * /query
-    * Returns a list of relevant TV shows based on a given query, or returns a "opular" list if no query is given
+    * Returns a list of relevant TV shows based on a given query, or returns a "popular" list if no query is given
   * /get/:id
     * Accepts a TMDB ID to return details of a specific TV show
 # Tests
@@ -151,7 +151,7 @@ Each module folder will contain some, if not all, the following directories:
   * mocks
   * schemas
   * services
-  * specs
+  * specs (our unit tests)
   * strategies 
 
 ## Author

@@ -63,6 +63,11 @@ export class AuthController
 
     /**
      * The purpose of this route is to allow clients to check if their JWt tokens are still valid.
+     * Why would a client need this? We could just let the server return code 401. In my mind,
+     * it just doesnt feel right to expect the client to relogin after a failed request. What if the
+     * user was in the middle of something and it happens to expire just then? This route allows any client
+     * to check their token at startup, so that if the user needs to login, they will do it near the beginning
+     * of their user experience.
      */
     @Get("ping")
     @UseGuards(AuthGuard())
