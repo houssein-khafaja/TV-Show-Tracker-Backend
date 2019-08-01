@@ -4,8 +4,8 @@ import { AuthModule } from './auth/auth.module';
 import { TVShowModule } from './tvshow/tvshow.module';
 import { AuthenticationMiddleware } from './auth/middleware/auth.middleware';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from './config.module';
-import { ConfigService } from './config.service';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 
 /**
  * App module where all our stuff lives.

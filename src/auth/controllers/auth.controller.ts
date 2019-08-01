@@ -4,7 +4,7 @@ import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { MongoExceptionFilter } from '../exception-filters/auth-exception.filter';
 import { AuthGuard } from '@nestjs/passport';
-import { ReturnPayload } from 'src/interfaces/general';
+import { ReturnPayload } from 'src/general-interface';
 
 /**---------------------------------------------------------------------------------------------------------------
  *  Authentication Controller

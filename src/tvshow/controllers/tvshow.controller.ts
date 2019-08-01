@@ -2,7 +2,7 @@ import { Controller, UseGuards, Get, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TmdbService } from '../services/tmdb.service';
 import { MinifiedShowModel, TvShowModel } from '../interfaces/subscription.interface';
-import { ReturnPayload } from 'src/interfaces/general';
+import { ReturnPayload } from 'src/general-interface';
 import { TvShowRequest, TvShowGetRequestParam } from '../dto/tvshow.dto';
 
 /**---------------------------------------------------------------------------------------------------------------

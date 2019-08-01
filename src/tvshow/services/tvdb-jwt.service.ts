@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnApplicationBootstrap, HttpService, BadRequestException } from '@nestjs/common';
-import { ConfigService } from '../../config.service';
+import { ConfigService } from '../../config/config.service';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 /**---------------------------------------------------------------------------------------------------------------

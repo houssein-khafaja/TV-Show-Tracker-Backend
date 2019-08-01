@@ -2,7 +2,7 @@ import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionsService } from '../services/subscriptions.service';
 import { SubscriptionRequest } from '../dto/subscriptions.dto';
-import { ReturnPayload } from '../../interfaces/general';
+import { ReturnPayload } from '../../general-interface';
 import { Subscription, TvShowModel } from '../interfaces/subscription.interface';
 import { DeleteWriteOpResultObject } from 'mongodb';
 import { DecodedJwt } from '../../auth/interfaces/decodedJwt.interface';

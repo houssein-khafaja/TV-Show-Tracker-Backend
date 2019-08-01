@@ -4,7 +4,7 @@ import { Model, Schema } from 'mongoose';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { randomBytes } from 'crypto';
 import { createTransport, SentMessageInfo } from 'nodemailer';
-import { ConfigService } from '../../config.service';
+import { ConfigService } from '../../config/config.service';
 var emailCheck = require('email-check');
 
 /**---------------------------------------------------------------------------------------------------------------

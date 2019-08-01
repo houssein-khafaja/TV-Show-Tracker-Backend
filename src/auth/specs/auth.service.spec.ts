@@ -21,10 +21,10 @@ import { AuthService } from "../services/auth.service";
 import { JwtStrategy } from "../strategies/jwt.strategy";
 import { EmailVerificationService } from "../services/email-verification.service";
 import { JwtModule, JwtService } from "@nestjs/jwt";
-import { ConfigService } from "../../config.service";
+import { ConfigService } from "../../config/config.service";
 import { userServiceMock } from "../mocks/user.mock";
 import { emailVerificationServiceMock } from "../mocks/email-verification.mock";
-import { configServiceMock } from "../../mocks/config.mock";
+import { configServiceMock } from "../../config/mocks/config.mock";
 import { UnauthorizedException } from "@nestjs/common";
 import { jwtServiceMock } from "../mocks/jwt-service.mock";
 

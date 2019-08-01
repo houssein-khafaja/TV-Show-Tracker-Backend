@@ -17,9 +17,9 @@
  *--------------------------------------------------------------------------------------------------------------------------------------**/
 
 import { Test } from "@nestjs/testing";
-import { ConfigService } from "../../config.service";
+import { ConfigService } from "../../config/config.service";
 import { TvdbJwtService } from "../services/tvdb-jwt.service";
-import { configServiceMock } from "../../mocks/config.mock";
+import { configServiceMock } from "../../config/mocks/config.mock";
 import { HttpService, BadRequestException } from "@nestjs/common";
 import { httpServiceMock } from "../mocks/http-service.mock";
 
