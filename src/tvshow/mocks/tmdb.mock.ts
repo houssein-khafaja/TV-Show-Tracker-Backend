@@ -21,6 +21,7 @@ export const tmdbServiceMock =
     })
 };
 
+// data normally received from TMDB
 export let mockedGenres =
     [
         { id: 10759, name: 'Action & Adventure' },

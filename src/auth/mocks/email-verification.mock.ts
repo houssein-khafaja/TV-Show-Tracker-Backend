@@ -4,6 +4,7 @@ let emails: string[] = [
     "username@email.com" // represents an email that exists in the world, is in our database, but is active
 ];
 
+
 export const emailVerificationServiceMock =
 {
     getEmailVerificationToken: jest.fn((_userId: number) => 
@@ -17,6 +18,18 @@ export const emailVerificationServiceMock =
             return undefined;
         }
     }),
-    sendVerificationEmail: jest.fn((email: string) => emails.includes(email)),
+
+    sendVerificationEmail: jest.fn((email: string) => 
+    {
+        if (emails.includes(email))
+        {
+            return email;
+        }
+        else
+        {
+            return { accepted: [], envelope: { to: [] } }
+        }
+    }),
+    
     doesEmailExist: jest.fn((email: string) => emails.includes(email))
 };

@@ -7,6 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';
 import { ConfigService } from './config.service';
 
+/**
+ * App module where all our stuff lives.
+ */
 @Module({
     imports: [AuthModule, TVShowModule, HttpModule,
         MongooseModule.forRoot('mongodb://localhost/app', { useNewUrlParser: true }),

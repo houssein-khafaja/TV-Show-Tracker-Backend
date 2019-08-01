@@ -4,10 +4,24 @@ import { promises } from 'fs';
 import { ConfigService } from '../../config.service';
 import { AxiosPromise, AxiosResponse, AxiosRequestConfig } from 'axios';
 
+/**
+ * This purpose of this service is to interface with the TMDB API to get TV show data.
+ * 
+ * Later on you will notice that we also hit the TVDB API in order to get the air times of the shows. We
+ * want the air times of the shows so that front-ends can send timely notifications to users tracking shows.
+ * 
+ * TMDB data usually have an external_ids field which contains the IDs of the show from other databases,
+ * and TVDB is included in that list. That means we can always get the TMDB data along with the TVDB ID at the same time, allowing
+ * us to reliably merge two sources of data together.
+ */
 @Injectable()
 export class TmdbService implements OnApplicationBootstrap
 {
+    // holds the list of all genres of TMDB shows
+    // we need to do this because sometimes we only get genre IDs,
+    // so we can use this array to cross reference and return the genre name
     private genres: MinifiedShowModel["genres"];
+
     /* istanbul ignore next */
     get genreList(): MinifiedShowModel["genres"] { return this.genres; }
 
@@ -23,8 +37,15 @@ export class TmdbService implements OnApplicationBootstrap
         this.genres = (await this.httpService.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${this.config.tmdbApiKey}&language=en-US`).toPromise()).data.genres;
     }
 
-    // searchs Tmdb with a query input and returns most relveant shows
-    // will return the most popular shows if no query word is given
+    /**
+     * Searchs TMDB with an optional query input and returns a paginated list of most relveant shows.
+     * Will return the most popular shows if no query word is given.
+     * @param pageStart starting page of data to return
+     * @param pageEnd last page of data to return
+     * @param query optional query param to filter results
+     * @throws BadRequestException if the pageStart is greater than pageEnd
+     * @returns an array of TV shows, of the MinifiedShowModel variety
+     */
     async queryShows(pageStart: number = 1, pageEnd: number = 10, query?: string): Promise<MinifiedShowModel[]>
     {
         if (pageStart > pageEnd)
@@ -34,18 +55,19 @@ export class TmdbService implements OnApplicationBootstrap
         else
         {
             const requestPromises: Promise<AxiosResponse>[] = []; // contains batch of promises
-            const showsToSend: MinifiedShowModel[] = [];
+            const showsToSend: MinifiedShowModel[] = []; // save all the shows we want to send to the user here
 
             // store all the promises for X - X pages of shows
             for (let i = pageStart; i <= pageEnd; i++)
             {
-                // query for a list of shows if a query is given, otherwise just return popular shows
                 if (query)
                 {
+                    // query for a list of shows if a query is given
                     requestPromises.push(this.httpService.get(`https://api.themoviedb.org/3/search/tv?api_key=${this.config.tmdbApiKey}&language=en-US&query=${query}&page=${i}`).toPromise());
                 }
                 else
                 {
+                    // otherwise just return popular shows
                     requestPromises.push(this.httpService.get(`https://api.themoviedb.org/3/discover/tv?api_key=${this.config.tmdbApiKey}&include_null_first_air_dates=false&language=en-US&sort_by=popularity.desc&without_genres=16&page=${i}`).toPromise());
                 }
 
@@ -70,6 +92,7 @@ export class TmdbService implements OnApplicationBootstrap
                         vote_count: show.vote_count,
                         genres: this.genereIDsToObjects(show.genre_ids),
                     }
+
                     showsToSend.push(popularShowToSend);
                 });
             });
@@ -86,7 +109,15 @@ export class TmdbService implements OnApplicationBootstrap
         return result[0];
     }
 
-    // gets a list of specific shows based on an array of show IDs
+    /**
+     * This method will return a collection of specific TV shows based on the provided
+     * showIDs. Both the TMDB and TVDB databases are hit in order to include all of the data we need. 
+     * TMDB provides most of it, while TVDB returns air times. The data we get from this method is more 
+     * detailed than queryShows().
+     * @param showIDs an array of show ID's to query the database with
+     * @throws BadRequestException when no show IDs were provided
+     * @returns an array of TV shows of the TvShowModel variety
+     */
     async getShows(showIDs: number[]): Promise<TvShowModel[]>
     {
         if (showIDs.length == 0)
@@ -155,11 +186,16 @@ export class TmdbService implements OnApplicationBootstrap
         return tvShowsToSend;
     }
 
-    //convert an array of genere IDs to full genre objects (which includes the names)
+    /**
+     * Convert an array of genere IDs to full genre objects (which includes the names).
+     * This is where our locally stored genres list comes in hand.
+     * @param genreIDs an array of genre IDs to be converted
+     * @returns an array genre objects
+     */
     genereIDsToObjects(genreIDs: number[]): MinifiedShowModel["genres"]
     {
         // the genres list (which contains all genres) gets filtered down to a subset of
-        // genres that have IDs that exist in the genreIDs array
+        // genres where their ID's match with at least one ID in the input array (genreIDs)
         return this.genreList.filter(i => genreIDs.indexOf(i.id) >= 0);
     }
 }

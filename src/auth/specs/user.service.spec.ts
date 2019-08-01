@@ -94,7 +94,7 @@ describe('User Service', () =>
             let sendVerificationEmailSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "sendVerificationEmail");
 
             // run tests
-            let results: SentMessageInfo = await userService.registerUser(email, password);
+            let results: string = await userService.registerUser(email, password);
             expect(doesEmailExistSpy).toBeCalledWith(email);
             expect(getUserSpy).toBeCalledWith(email);
             expect(sendVerificationEmailSpy).toBeCalledWith(email, 0);
@@ -108,7 +108,7 @@ describe('User Service', () =>
             let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
 
             // run tests
-            let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
+            let results: Promise<string> = userService.registerUser(email, password);
             await expect(results).rejects.toThrow(NotFoundException);
             expect(doesEmailExistSpy).toBeCalledWith(email);
         });
@@ -123,7 +123,8 @@ describe('User Service', () =>
             let sendVerificationEmailSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "sendVerificationEmail");
 
             // run tests
-            let results: SentMessageInfo = await userService.registerUser(email, password);
+            let results: string = await userService.registerUser(email, password);
+            expect(results).toBe(email);
             expect(doesEmailExistSpy).toBeCalledWith(email);
             expect(getUserSpy).toBeCalledWith(email);
             expect(sendVerificationEmailSpy).toBeCalledWith(email, userServiceMock.getUser(email)._id);
@@ -137,7 +138,7 @@ describe('User Service', () =>
             let doesEmailExistSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "doesEmailExist");
 
             // run tests
-            let results: Promise<SentMessageInfo> = userService.registerUser(email, password);
+            let results: Promise<string> = userService.registerUser(email, password);
             await expect(results).rejects.toThrow(UnprocessableEntityException);
             expect(doesEmailExistSpy).toBeCalledWith(email);
         });

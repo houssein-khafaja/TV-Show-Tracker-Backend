@@ -5,7 +5,6 @@ export const hashedPassword: string = "$2b$10$dpeZh0MDCz0vSv9UmzfTVuPsn5502QuekH
 export const userServiceMock =
 {
     registerUser: jest.fn(() => { }),
-    // deleteUser: jest.fn(() => { }),
     getUser: jest.fn((email: string) => 
     {
         // returns active user

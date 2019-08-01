@@ -84,7 +84,7 @@ describe('Email Verification Service', () =>
         emailVerificationService = module.get<EmailVerificationService>(EmailVerificationService);
 
         // override nodemailer so it doesnt actually send an email
-        (<jest.Mock>nodemailer.createTransport).mockReturnValue({ "sendMail": jest.fn() });
+        (<jest.Mock>nodemailer.createTransport).mockReturnValue({ "sendMail": jest.fn(()=> ({ accepted: ["doesnt matter whats here"], envelope: { to: ["email"] } })) });
 
     });
 

@@ -3,6 +3,7 @@ import { isNumber } from 'util';
 import { DecodedJwt } from 'src/auth/interfaces/decodedJwt.interface';
 
 
+// for /add and /remove routes
 export class SubscriptionRequest
 {
     @IsNumber({}, { message: "tmdbID must be a valid number" })
@@ -10,9 +11,3 @@ export class SubscriptionRequest
 
     readonly decodedJwt: DecodedJwt;
 }
-
-// export class SubscriptionRequestHeaders
-// {
-//     @IsString({ message: "Authorization header must exist as a string." })
-//     readonly authorization: string;
-// }

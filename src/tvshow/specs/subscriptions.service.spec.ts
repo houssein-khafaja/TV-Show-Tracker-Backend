@@ -22,13 +22,10 @@
  *--------------------------------------------------------------------------------------------------------------------------------------**/
 
 import { Test } from "@nestjs/testing";
-import { ConfigService } from "../../config.service";
 import { getModelToken } from "@nestjs/mongoose";
 import { SubscriptionsService } from "../services/subscriptions.service";
 import { TmdbService } from "../services/tmdb.service";
 import { tmdbServiceMock, mockedShowsList } from "../mocks/tmdb.mock";
-import { EmailVerificationService } from "src/auth/services/email-verification.service";
-import { EmailVerificationToken } from "src/auth/interfaces/email-verification-token.interface";
 import { Subscription, TvShowModel } from "../interfaces/subscription.interface";
 import { ConflictException, NotFoundException } from "@nestjs/common";
 

@@ -7,6 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from './config.module';
 import { ConfigService } from './config.service';
 
+/**
+ * Almost identical to the regular app module, except for the mongoDB Uri.
+ * Used for e2e testing.
+ */
 @Module({
     imports: [AuthModule, TVShowModule, HttpModule,
         MongooseModule.forRoot('mongodb://localhost/appTest', { useNewUrlParser: true }),

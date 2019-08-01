@@ -272,8 +272,6 @@ describe('App', () =>
                 const users = db.collection('users');
                 const emailVerificationTokens = db.collection('emailverificationtokens');
                 const user = await users.findOne({ email: "houssein.dev@gmail.com" });
-                console.log(user);
-
                 emailVerificationToken = (await emailVerificationTokens.findOne({ _userId: user._id })).token;
 
                 return request(httpServer)
@@ -503,8 +501,6 @@ describe('App', () =>
 
             it("[With tmdbID = 1] returns 201: message: Subscription was successfully added!", () =>
             {
-                console.log(jwtToken);
-
                 return request(httpServer)
                     .post('/subscriptions/add')
                     .set('Authorization', 'bearer ' + jwtToken)
@@ -518,8 +514,6 @@ describe('App', () =>
 
             it("[With tmdbID = 2] returns 201: message: Subscription was successfully added!", () =>
             {
-                console.log(jwtToken);
-
                 return request(httpServer)
                     .post('/subscriptions/add')
                     .set('Authorization', 'bearer ' + jwtToken)
@@ -533,8 +527,6 @@ describe('App', () =>
 
             it("[With tmdbID = 3] returns 201: message: Subscription was successfully added!", () =>
             {
-                console.log(jwtToken);
-
                 return request(httpServer)
                     .post('/subscriptions/add')
                     .set('Authorization', 'bearer ' + jwtToken)
@@ -548,8 +540,6 @@ describe('App', () =>
 
             it("[With tmdbID = 3] returns 201: message: Subscription was successfully added!", () =>
             {
-                console.log(jwtToken);
-
                 return request(httpServer)
                     .post('/subscriptions/add')
                     .set('Authorization', 'bearer ' + jwtToken)

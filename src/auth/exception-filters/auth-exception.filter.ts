@@ -2,6 +2,10 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/co
 import { Request, Response } from 'express';
 import { MongoError } from 'mongodb';
 
+/**
+ * This was placed just in case mongo complains about duplicate keys.
+ * However, it should be impossible to get here.
+ */
 @Catch(MongoError)
 export class MongoExceptionFilter implements ExceptionFilter
 {

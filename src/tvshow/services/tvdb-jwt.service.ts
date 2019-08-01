@@ -2,6 +2,9 @@ import { Injectable, OnModuleInit, OnApplicationBootstrap, HttpService, BadReque
 import { ConfigService } from '../../config.service';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
+/**---------------------------------------------------------------------------------------------------------------
+ * The purpose of this service is to manage the getting and refreshing of the TVDB JWT token.
+ * ---------------------------------------------------------------------------------------------------------------*/
 @Injectable()
 export class TvdbJwtService implements OnApplicationBootstrap
 {
@@ -10,12 +13,18 @@ export class TvdbJwtService implements OnApplicationBootstrap
         private readonly httpService: HttpService)
     { }
 
-    // use api credentials to get our 24hour JWt token
+    // on startup get our token
     async onApplicationBootstrap()
     {
         await this.getNewTvdbJwtToken();
     }
 
+    /**
+     * When the server first starts, we want to get a new fresh JWT token since they only last 24 hours.
+     * This method will hit their API to get a new one and store it in our config object.
+     * @throws BadRequestException when it doesnt work
+     * @returns true if it works
+     */
     async getNewTvdbJwtToken(): Promise<boolean>
     {
         const body =
@@ -40,6 +49,16 @@ export class TvdbJwtService implements OnApplicationBootstrap
         }
     }
 
+    /**
+     * This method refreshes our TVDB jwt token.
+     * 
+     * Since the TVDB jwt token only lasts 24 hours, we need to refresh it as often as we can.
+     * We could spin a new thread and have a loop that iterates every 23 hours or so to run this method,
+     * but NestJS prefers to handle multithreading via apps like Docker. So for now, I will simply make this 
+     * method available and have it run whenever a request arrives to the server via middleware.
+     * I dont like this idea since the server will stop working properly if it doesnt receive a request within 24 hours.
+     * I might come up with a different solution later.
+     */
     async refreshTvdbJwtToken(): Promise<boolean>
     {
         const config: AxiosRequestConfig = { headers: { Authorization: "Bearer " + this.config.tvdbJwtToken } }

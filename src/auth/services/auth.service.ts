@@ -7,6 +7,10 @@ import { compare } from 'bcrypt';
 import { EmailVerificationToken } from '../interfaces/email-verification-token.interface';
 import { EmailVerificationService } from './email-verification.service';
 
+/**---------------------------------------------------------------------------------------------------------------
+ * This Service handles user logins and email verifications.
+ * Each method will be responsible for throwing exceptions when appropriate.
+ * ---------------------------------------------------------------------------------------------------------------*/
 @Injectable()
 export class AuthService
 {
@@ -16,6 +20,15 @@ export class AuthService
         private readonly emailVerificationService: EmailVerificationService)
     { }
 
+    /**
+     * After finding the user via email, this method will brcypt.compare the provided
+     * password to the stored password. If the passwords match, then a signed JWt token 
+     * is returned.
+     * @param email user email
+     * @param password user password
+     * @throws UnauthorizedException if passwords do not match, if the user was not found, or if the user is not verified
+     * @returns a signed JWT token
+     */
     async login(email: string, password: string): Promise<string>
     {
         // find user then compare password to hashed password
@@ -34,7 +47,15 @@ export class AuthService
         }
     }
 
-    async verifyUser(email: string, verifyToken: string): Promise<string>
+    /**
+     * Once a user is found, the provided verification token is compared with the
+     * stored token in our database. Then the appropriate message is returned, which 
+     * is assumed  to be used inside of an HTML view.
+     * @param email user email
+     * @param verifyToken email verification token
+     * @returns a message depending on the status of the verification request
+     */
+    async verifyUserByEmail(email: string, verifyToken: string): Promise<string>
     {
         // find user
         const user: User = await this.userService.getUser(email);

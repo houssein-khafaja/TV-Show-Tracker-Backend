@@ -8,6 +8,11 @@ export interface EnvConfig
     [key: string]: string;
 }
 
+/**
+ * This service simply reads in a .env config file into memory and provides other
+ * app components with access to those properties.  Joi is used for some validation,
+ * but it could be used better.
+ */
 @Injectable()
 export class ConfigService
 {
@@ -54,7 +59,7 @@ export class ConfigService
             TVDB_SERIES_URI: Joi.string().default(''),
             TVDB_JWT_TOKEN: Joi.string().default('')
         });
-
+        
         const { error, value: validatedEnvConfig } = Joi.validate(envConfig, envVarsSchema);
 
         if (error)

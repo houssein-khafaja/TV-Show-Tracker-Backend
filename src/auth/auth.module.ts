@@ -19,10 +19,6 @@ import { ConfigModule } from '../config.module';
         MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, { name: "EmailVerificationToken", schema: EmailVerificationTokenSchema }]),
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
-            // secret: passportSecert,
-            // signOptions: {
-            //     expiresIn: '360d',
-            // },
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
                 secret: configService.jwtSecret,

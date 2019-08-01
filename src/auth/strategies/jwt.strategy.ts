@@ -19,10 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy)
 
     }
 
+    // check to make sure that the payload was correctly signed and unsigned by us
     async validate(payload: JwtPayload)/* : Promise<JwtPayload | null> */
     {
         const user = await this.userService.getUser(payload.email, false);
-
+        
         if (!user || !user.isActive)
         {
             throw new UnauthorizedException("User was either not found or is not verified by email.");

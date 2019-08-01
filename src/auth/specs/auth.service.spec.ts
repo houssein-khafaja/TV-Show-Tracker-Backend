@@ -128,7 +128,7 @@ describe('Auth Service', () =>
             let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
 
             // run tests
-            let testResults: string = await authService.verifyUser(email, emailVerifyToken);
+            let testResults: string = await authService.verifyUserByEmail(email, emailVerifyToken);
             expect(testResults).toBe("User was not found!");
             expect(getUserSpy).toBeCalledWith(email);
         });
@@ -141,7 +141,7 @@ describe('Auth Service', () =>
             let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
 
             // run tests
-            let testResults: string = await authService.verifyUser(email, emailVerifyToken);
+            let testResults: string = await authService.verifyUserByEmail(email, emailVerifyToken);
             expect(testResults).toBe("Email is already verified!");
             expect(getUserSpy).toBeCalledWith(email);
         });
@@ -155,7 +155,7 @@ describe('Auth Service', () =>
             let getEmailVerificationTokenSpy: jest.SpyInstance = jest.spyOn(emailVerificationServiceMock, "getEmailVerificationToken");
 
             // run tests
-            let testResults: string = await authService.verifyUser(email, emailVerifyToken);
+            let testResults: string = await authService.verifyUserByEmail(email, emailVerifyToken);
             expect(testResults).toBe("not_active@email.com was successfully verified!");
             expect(getUserSpy).toBeCalledWith(email);
             expect(getEmailVerificationTokenSpy).toBeCalledWith(userServiceMock.getUser(email)._id);
@@ -169,7 +169,7 @@ describe('Auth Service', () =>
             let getUserSpy: jest.SpyInstance = jest.spyOn(userServiceMock, "getUser");
 
             // run tests
-            let testResults: string = await authService.verifyUser(email, emailVerifyToken);
+            let testResults: string = await authService.verifyUserByEmail(email, emailVerifyToken);
             expect(testResults).toBe("Email was NOT verified! Please re-register to resend the verification link.");
             expect(getUserSpy).toBeCalledWith(email);
         });

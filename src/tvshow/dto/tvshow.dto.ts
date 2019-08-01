@@ -2,7 +2,9 @@ import { IsEmail, IsNotEmpty, Min, IsString, MinLength, IsNumber, IsOptional, Is
 import { isNumber } from 'util';
 import { DecodedJwt } from 'src/auth/interfaces/decodedJwt.interface';
 
-
+/**
+ * Use for /query route
+ */
 export class TvShowRequest
 {
 
@@ -18,14 +20,9 @@ export class TvShowRequest
 
 }
 
+// used for /get/:id route
 export class TvShowGetRequestParam
 {
     @IsNumberString({ message: "id must be a number" })
     id: number
 }
-
-// export class SubscriptionRequestHeaders
-// {
-//     @IsString({ message: "Authorization header must exist as a string." })
-//     readonly authorization: string;
-// }
