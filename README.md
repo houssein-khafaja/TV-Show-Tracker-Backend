@@ -93,7 +93,7 @@ This project includes 52 unit tests and 47 end-to-end integration tests.
 
 ## Break down into unit tests
 
-The unit tests only test the services of the application (which hold most of the logic). They are comprehensive enough to have 99.42% test coverage. Above each .spec file contains the test plan for the respective file, but here is an example snippet:
+The unit tests only test the services of the application (which hold most of the logic). They are comprehensive enough to have 99.42% test coverage. At the top of each each .spec file contains the test plan for the respective file, but here is an example snippet:
 
 ```
 registerUser()
