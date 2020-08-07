@@ -30,7 +30,7 @@
     "@shelf/jest-mongodb": "^1.1.0",
     "@types/imap": "^0.8.29",
     "bcrypt": "^3.0.6",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.9.1",
     "crypto": "^1.0.1",
     "dotenv": "^8.0.0",
